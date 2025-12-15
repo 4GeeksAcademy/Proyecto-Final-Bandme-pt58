@@ -14,6 +14,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
     password_hash: Mapped[str] = mapped_column(String(50), nullable=False)
     role: Mapped[str] = mapped_column(Enum("musician", "band", "enterprise", name="user_roles"), nullable=False)
+
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
 
@@ -85,13 +86,13 @@ class FeedPost(db.Model):
     comments_count: Mapped[int] = mapped_column(Integer, default=0)
 
     author = relationship("User", back_populates="posts")
-    media_files = relationship("Mediafile", back_populates="post")
+    media_files = relationship("MediaFile", back_populates="post")
     likes = relationship("Like", back_populates="post")
 
     @property
     def serialize(self):
         return {
-            "profile_id": self.profile_id,
+            "post_id": self.profile_id,
             "user_id": self.user_id,
             "content_text": self.content_text,
             "created_at": self.created_at.isoformat() if self.created_at else None,
@@ -126,7 +127,7 @@ class Follower(db.Model):
     __tablename__ = "followers"
 
     follower_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
-    follower_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
+    followed_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     @property
@@ -159,12 +160,12 @@ class Like(db.Model):
         }
     
 class FavoriteElement(db.Model):
-    __tablename__= "favorite_elements"
+    __tablename__="favorite_elements"
 
     favorite_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False)
 
-    element_type: Mapped[str] = mapped_column(Enum("post", "user", "event", name=favorite_types))
+    element_type: Mapped[str] = mapped_column(Enum("post", "user", "event", name="favorite_types"))
     element_id: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
