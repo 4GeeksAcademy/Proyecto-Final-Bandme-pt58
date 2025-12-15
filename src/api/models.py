@@ -158,3 +158,24 @@ class Like(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
     
+class FavoriteElement(db.Model):
+    __tablename__= "favorite_elements"
+
+    favorite_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False)
+
+    element_type: Mapped[str] = mapped_column(Enum("post", "user", "event", name=favorite_types))
+    element_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    user = relationship("User", back_populates="favorites")
+
+    @property
+    def serialize(self):
+        return {
+            "favorite_id": self.favorite_id,
+            "user_id": self.user_id,
+            "element_type": self.element_type,
+            "element_id": self.element_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
