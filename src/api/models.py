@@ -69,3 +69,31 @@ class UserProfile(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
+    
+class FeedPost(db.Model):
+    __tablename__="feed_posts"
+
+    post_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False)
+
+    content_text: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
+    likes_count: Mapped[int] = mapped_column(Integer, default=0)
+    comments_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    author = relationship("User", back_populates="posts")
+    media_files = relationship("Mediafile", back_populates="post")
+    likes = relationship("Like", back_populates="post")
+
+    @property
+    def serialize(self):
+        return {
+            "profile_id": self.profile_id,
+            "user_id": self.user_id,
+            "content_text": self.content_text,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "likes_count": self.likes_count,
+            "media_files": [m.serialize for m in self.media_files]
+        }
