@@ -136,3 +136,25 @@ class Follower(db.Model):
             "followed_id": self.followed_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+
+class Like(db.Model):
+    __tablename__ = "likes"
+
+    like_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False)
+    post_id: Mapped[int] = mapped_column(ForeignKey("feed_posts.post_id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    user = relationship("User", back_populates="likes")
+    post = relationship("FeedPost", back_populates="likes")
+
+    
+    @property
+    def serialize(self):
+        return {
+            "like_id": self.like_id,
+            "user_id": self.user_id,
+            "post_id": self.post_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+    
