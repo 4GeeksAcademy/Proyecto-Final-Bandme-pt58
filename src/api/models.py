@@ -22,6 +22,7 @@ class User(db.Model):
     likes = relationship("Like", back_populates="user")
     favorites = relationship("FavoriteElement", back_populates="user")
 
+    @property
     def serialize(self):
         return{
         "user_id": self.user_id,
@@ -52,7 +53,8 @@ class UserProfile(db.Model):
     updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
 
     user = relationship("User", back_populates="profile")
-
+    
+    @property
     def serialize(self):
         return {
             "profile_id": self.profile_id,
@@ -96,4 +98,41 @@ class FeedPost(db.Model):
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "likes_count": self.likes_count,
             "media_files": [m.serialize for m in self.media_files]
+        }
+    
+class MediaFile(db.Model):
+    __tablename__="media_files"
+
+    media_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("feed_posts.post_id"), nullable=False)
+
+    file_url: Mapped[str] = mapped_column(String(200), nullable=False)
+    file_type: Mapped[str] = mapped_column(Enum("image", "video", "audio", name="media_types"))
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    post = relationship("FeedPost", back_populates="media_files")
+
+    @property
+    def serialize(self):
+        return {
+            "media_id": self.media_id,
+            "post_id": self.post_id,
+            "file_url": self.file_url,
+            "file_type": self.file_type,
+            "uploaded_at": self.uploaded_at.isoformat() if self.uploaded_at else None
+        }
+
+class Follower(db.Model):
+    __tablename__ = "followers"
+
+    follower_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
+    follower_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    @property
+    def serialize(self):
+        return {
+            "follower_id": self.follower_id,
+            "followed_id": self.followed_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
