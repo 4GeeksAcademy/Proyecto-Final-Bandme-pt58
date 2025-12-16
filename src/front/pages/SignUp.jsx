@@ -8,12 +8,23 @@ export const SignUp = () => {
 					<h1 className="navbar-brand text-center w-100 h1">BandMe</h1>
 				</div>
 			</nav>
-<div>
-	<p className="text-center mt-3"><b>What kind of account would you like?</b></p>
-</div>
+			<div>
+				<p className="text-center mt-3"><b>What kind of account would you like?</b></p>
+			</div>
 
 			<div className="container mt-4">
 				<form className="row g-3">
+					<div className="col-md-12">
+						<label htmlFor="userName" className="form-label">
+							User name:
+						</label>
+						<input
+							type="text"
+							className="form-control"
+							id="userName"
+						/>
+					</div>
+
 					<div className="col-md-12">
 						<label htmlFor="inputEmail" className="form-label">
 							Email:
@@ -35,40 +46,15 @@ export const SignUp = () => {
 							id="inputPassword"
 						/>
 					</div>
-
 					<div className="col-md-12">
-						<label htmlFor="firstName" className="form-label">
-							First name:
-						</label>
-						<input
-							type="text"
-							className="form-control"
-							id="firstName"
-						/>
+						<label for="role" className="form-label">Role:</label>
+						<select id="role" className="form-select">
+							<option selected>Choose...</option>
+							<option>Musician</option>
+							<option>Band</option>
+							<option>Industry</option>
+						</select>
 					</div>
-
-					<div className="col-md-12">
-						<label htmlFor="lastName" className="form-label">
-							Last name:
-						</label>
-						<input
-							type="text"
-							className="form-control"
-							id="lastName"
-						/>
-					</div>
-
-					<div className="col-md-12">
-						<label htmlFor="inputZip" className="form-label">
-							ZIP code:
-						</label>
-						<input
-							type="text"
-							className="form-control"
-							id="inputZip"
-						/>
-					</div>
-
 					<div className="col-12">
 						<button type="submit" className="btn btn-secondary w-100">
 							Sign up
