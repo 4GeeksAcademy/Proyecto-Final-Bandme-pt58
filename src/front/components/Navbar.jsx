@@ -1,19 +1,14 @@
 import { Link } from "react-router-dom";
-
+import useGlobalReducer from "../hooks/useGlobalReducer";
 export const Navbar = () => {
-
+	const { store } = useGlobalReducer()
 	return (
-		<nav className="navbar navbar-light bg-light">
-			<div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">React Boilerplate</span>
-				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Check the Context in action</button>
-					</Link>
-				</div>
-			</div>
+		<nav className="navbar navbar-dark bg-dark">
+			{store.currentUser ?  
+			<h1>Navbar para el usuario conectado</h1>
+			:
+			<h1>Navbar para el usuario no registrado</h1>
+		}
 		</nav>
 	);
 };
