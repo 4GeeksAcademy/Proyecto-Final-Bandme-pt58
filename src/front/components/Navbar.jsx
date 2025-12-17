@@ -26,7 +26,7 @@ export const Navbar = () => {
 									<a class="nav-link" href="#">LIBRERY</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link" href="#"><i class="fa-solid fa-circle-user"></i></a>
+									<a class="nav-link" href="#"><img src="https://i.pinimg.com/736x/b1/40/cf/b140cf1ff6dfc4002d6ac79b12a40d92.jpg" className="img-fluid rounded-circle" alt="..." width="20px" height="30px" /></a>
 								</li>
 
 							</ul>
