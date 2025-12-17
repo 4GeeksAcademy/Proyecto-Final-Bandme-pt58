@@ -13,7 +13,7 @@ export const initialStore=()=>{
         background: null,
       }
     ],
-    currentUser: false
+    currentUser: true
   }
 }
 

@@ -3,12 +3,69 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 export const Navbar = () => {
 	const { store } = useGlobalReducer()
 	return (
-		<nav className="navbar navbar-dark bg-dark">
-			{store.currentUser ?  
-			<h1>Navbar para el usuario conectado</h1>
-			:
-			<h1>Navbar para el usuario no registrado</h1>
-		}
+		<nav className="navbar navbar-dark bg-dark text-white">
+			{/* {store.currentUser ? */}
+				<nav class="navbar navbar-expand-lg bg-dark navbar-dark w-100">
+					<div class="container-fluid">
+						<a class="navbar-brand" href="#">BANDME</a>
+						<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+						<div class="collapse navbar-collapse" id="navbarSupportedContent">
+							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+								<li class="nav-item">
+									<a class="nav-link active" aria-current="page" href="#">HOME</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="#">COMMUNITY</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="#">ABOUT US</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="#">LIBRERY</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="#"><i class="fa-solid fa-circle-user"></i></a>
+								</li>
+
+							</ul>
+							<form class="d-flex" role="search">
+								<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+								<button class="btn btn-outline-success" type="submit">Search</button>
+							</form>
+						</div>
+					</div>
+				</nav>
+				{/* : */}
+				<nav class="navbar navbar-expand-lg bg-dark navbar-dark w-100">
+					<div class="container-fluid">
+						<a class="navbar-brand" href="#">BANDME</a>
+						<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+						<div class="collapse navbar-collapse" id="navbarSupportedContent">
+							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+								<li class="nav-item">
+									<a class="nav-link active" aria-current="page" href="#">HOME</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="#">COMMUNITY</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="#">ABOUT US</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="#">LIBRERY</a>
+								</li>
+							</ul>
+							<form class="d-flex" role="search">
+								<button class="btn btn-outline-success" type="submit">LOGIN</button>
+							</form>
+						</div>
+					</div>
+				</nav>
+			{/* } */}
 		</nav>
 	);
 };
