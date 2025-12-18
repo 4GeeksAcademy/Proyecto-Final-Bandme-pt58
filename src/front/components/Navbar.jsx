@@ -37,7 +37,7 @@ export const Navbar = () => {
 						</div>
 					</div>
 				</nav>
-				 : 
+				:
 				<nav class="navbar navbar-expand-lg bg-dark navbar-dark w-100">
 					<div class="container-fluid">
 						<a class="navbar-brand" href="#">BANDME</a>
@@ -65,7 +65,7 @@ export const Navbar = () => {
 						</div>
 					</div>
 				</nav>
-			 } 
+			}
 		</nav>
 	);
 };
