@@ -4,7 +4,7 @@ export const Navbar = () => {
 	const { store } = useGlobalReducer()
 	return (
 		<nav className="navbar navbar-dark bg-dark text-white">
-			{/* {store.currentUser ? */}
+			{store.currentUser ?
 				<nav class="navbar navbar-expand-lg bg-dark navbar-dark w-100">
 					<div class="container-fluid">
 						<a class="navbar-brand" href="#">BANDME</a>
@@ -26,7 +26,7 @@ export const Navbar = () => {
 									<a class="nav-link" href="#">LIBRERY</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link" href="#"><img src="https://i.pinimg.com/736x/b1/40/cf/b140cf1ff6dfc4002d6ac79b12a40d92.jpg" className="img-fluid rounded-circle" alt="..." width="20px" height="30px" /></a>
+									<a class="nav-link" href="#"><img src="https://i.pinimg.com/736x/b1/40/cf/b140cf1ff6dfc4002d6ac79b12a40d92.jpg" className="mt-3 rounded-circle" alt="..." width="40px" height="40px" /></a>
 								</li>
 
 							</ul>
@@ -37,7 +37,7 @@ export const Navbar = () => {
 						</div>
 					</div>
 				</nav>
-				{/* : */}
+				 : 
 				<nav class="navbar navbar-expand-lg bg-dark navbar-dark w-100">
 					<div class="container-fluid">
 						<a class="navbar-brand" href="#">BANDME</a>
@@ -65,7 +65,7 @@ export const Navbar = () => {
 						</div>
 					</div>
 				</nav>
-			{/* } */}
+			 } 
 		</nav>
 	);
 };
