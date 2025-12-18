@@ -22,7 +22,7 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
-@api.route('/users', methods=['POST'])
+@api.route('/user', methods=['POST'])
 def create_user():
     try:
        data = request.get_json()
@@ -51,7 +51,7 @@ def get_users():
         print(f"Error al obtener los usuario: {e}")
         return jsonify({"msg": "Internal Server Error", "error": str(e)}), 
 
-@api.route('/users/<int:user_id>', methods=['GET'])
+@api.route('/user/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     try:
        user = User.query.get(user_id)
@@ -76,7 +76,7 @@ def update_user(user_id):
     except Exception as e:   
      return jsonify({"message": "Usuario no encontrado"}), 404
     
-@api.route('/users/<int:user_id>', methods=['DELETE'])
+@api.route('/user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
         try:   
             user = User.query.get(user_id)
@@ -87,7 +87,7 @@ def delete_user(user_id):
         except Exception as e:  
           return jsonify({"message": "Usuario no encontrado"}), 404
         
-@api.route('/user_profiles', methods=['POST'])
+@api.route('/user_profile', methods=['POST'])
 def create_profile():
     try:
        data = request.get_json()
@@ -122,7 +122,7 @@ def get_profiles():
         return jsonify({"msg": "Perfiles no encontrados"}), 400  
     
 
-@api.route('/user_profiles/<int:profile_id>', methods=['GET'])
+@api.route('/user_profile/<int:profile_id>', methods=['GET'])
 def get_profile(profile_id):
     try:
        profile = UserProfile.query.get(profile_id)
@@ -132,10 +132,10 @@ def get_profile(profile_id):
     except Exception as e:
      return jsonify({"message": "Perfil no encontrado"}), 404
 
-@api.route('/user_profiles', methods=['PUT'])
+@api.route('/user_profile', methods=['PUT'])
 def update_profile(profile_id):     
     try:
-         data =  request.get.json()
+         data =  request.get_json()
          profile = UserProfile.query.get(profile_id)
          if profile:
             profile.display_name=data.get('display_name', profile.display_name),
@@ -152,7 +152,19 @@ def update_profile(profile_id):
     except Exception as e:   
      return jsonify({"message": "Perfil no encontrado"}), 404
     
-@api.route('/feed_posts', methods=['POST'])
+
+@api.route('/user_profile/<int:profile_id>', methods=['DELETE'])
+def delete_profile(profile_id):
+    try:
+       profile = UserProfile.query.get(profile_id)
+       if profile:
+             db.session.delete(profile)
+             db.session.commit()
+             return jsonify({"message": "Perfil de usuario eliminado con éxito"}), 200
+    except Exception as e:  
+        return jsonify({"message": "Perfil de usuario no encontrado"}), 404       
+    
+@api.route('/feed_post', methods=['POST'])
 def create_post():
     try:
        data = request.get_json()
@@ -176,13 +188,13 @@ def get_all_posts():
        return jsonify([post.serialize for post in posts])
 
     except Exception as e:   
-     return jsonify({"message": "Post no encontrado "}), 404
+     return jsonify({"message": "Posts no encontrados "}), 404
 
 
-@api.route('/feed_posts', methods=['PUT'])
-def update_posts(post_id):
+@api.route('/feed_post/<int:post_id>', methods=['PUT'])
+def update_post(post_id):
     try: 
-        data = request.get.json()
+        data = request.get_json()
         post = post.query.get(post_id)
         if post:
            post.content_text = data.get('content_text', post.content_text)
@@ -192,7 +204,7 @@ def update_posts(post_id):
     except Exception as e:   
      return jsonify({"message": "No se pudo actualizar el post"}), 404
 
-@api.route('/feed_posts/<int:post_id>', methods=['GET'])
+@api.route('/feed_post/<int:post_id>', methods=['GET'])
 def get_post(post_id):
     try:
        post = FeedPost.query.get(post_id)
@@ -200,8 +212,21 @@ def get_post(post_id):
            return jsonify(post.serialize)
     except Exception as e:   
        return jsonify({"message": "Post no encontrado"}), 404
+    
 
-@api.route('/favorite_elements', methods=['POST'])
+@api.route('/feed_post/<int:post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    try:
+       post = FeedPost.query.get(post_id)
+       if post:
+             db.session.delete(post)
+             db.session.commit()
+             return jsonify({"message": "Post eliminado con éxito"}), 200
+    except Exception as e:  
+        return jsonify({"message": "Post no encontrado"}), 404    
+
+
+@api.route('/favorite_element', methods=['POST'])
 def create_favorite():
     try:
        data = request.get_json()
@@ -217,7 +242,7 @@ def create_favorite():
        return jsonify({"message": "Error al crear favoritos"}), 404
 
 
-@api.route('/users/<int:user_id>/favorites', methods=['GET'])
+@api.route('/user/<int:user_id>/favorites', methods=['GET'])
 def get_favorites(user_id):
     try:
        favorites = FavoriteElement.query.filter_by(user_id=user_id).all()
