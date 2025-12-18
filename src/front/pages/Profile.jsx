@@ -5,7 +5,7 @@ export const Profile = () => {
 
 
         <div className="col-md-4">
-          <img src="https://i.pinimg.com/736x/b1/40/cf/b140cf1ff6dfc4002d6ac79b12a40d92.jpg" className="img-fluid rounded-circle" alt="..." width="300px" height="300px" />
+          <img src="https://i.pinimg.com/736x/b1/40/cf/b140cf1ff6dfc4002d6ac79b12a40d92.jpg" className="rounded-circle mt-2" alt="..." width="300px" height="300px" />
           <h1>
             <i class="fa-solid fa-star"></i>
             <i class="fa-solid fa-star"></i>
