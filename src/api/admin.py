@@ -1,8 +1,8 @@
 import os
 import inspect
-from flask_admin import Admin
+from flask_admin import Admin 
 from . import models
-from .models import db
+from .models import db, User, UserProfile, FeedPost, MediaFile, Follower, Like, FavoriteElement
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.theme import Bootstrap4Theme
 

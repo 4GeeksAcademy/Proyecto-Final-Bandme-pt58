@@ -10,13 +10,13 @@ class User(db.Model):
     __tablename__= "users"
 
     user_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
-    email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
-    password_hash: Mapped[str] = mapped_column(String(50), nullable=False)
+    username: Mapped[str] = mapped_column(String(50), nullable=True, unique=True)
+    email: Mapped[str] = mapped_column(String(50), nullable=True, unique=True)
+    password_hash: Mapped[str] = mapped_column(String(400), nullable=True)
     role: Mapped[str] = mapped_column(Enum("musician", "band", "enterprise", name="user_roles"), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=True)
 
     profile = relationship("UserProfile", back_populates="user", uselist=False)
     posts = relationship("FeedPost", back_populates="author")
@@ -92,7 +92,7 @@ class FeedPost(db.Model):
     @property
     def serialize(self):
         return {
-            "post_id": self.profile_id,
+            "post_id": self.post_id,
             "user_id": self.user_id,
             "content_text": self.content_text,
             "created_at": self.created_at.isoformat() if self.created_at else None,
