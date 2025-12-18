@@ -1,8 +1,8 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint, UserProfile, FeedPost
-from api.models import db, User
+from flask import Flask, request, jsonify, url_for, Blueprint 
+from api.models import db, User, UserProfile, FeedPost, FavoriteElement, MediaFile, Follower, Like
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -29,9 +29,9 @@ def create_user():
        new_user = User(
        username=data['username'],
        email=data['email'],
-       password_hash=data['password'],  # Asegúrate de usar un hash para la contraseña
-       role=data['role'],
-       is_active=True
+       password_hash=data['password_hash'],  # Asegúrate de usar un hash para la contraseña
+       role=data['role']
+       
     )
        db.session.add(new_user)
        db.session.commit()
@@ -39,7 +39,7 @@ def create_user():
 
     except Exception as e:
         print(f"Error al crear usuario: {e}")
-        return jsonify({"msg": "Internal Server Error", "error": str(e)}), 
+        return jsonify({"msg": "Internal Server Error", "error": str(e)}), 500 
 
 @api.route('/users', methods=['GET'])
 def get_users():
@@ -111,6 +111,17 @@ def create_profile():
           return jsonify({"message": "No se pudo crear el perfil de usuario"}), 404
     
 
+@api.route('/user_profiles', methods=['GET'])
+def get_profiles():
+    try:
+       profiles = UserProfile.query.all()
+       return jsonify([profile.serialize for profile in profiles])
+    
+    except Exception as e:
+        print(f"Error al obtener los perfiles de usuario: {e}")
+        return jsonify({"msg": "Perfiles no encontrados"}), 400  
+    
+
 @api.route('/user_profiles/<int:profile_id>', methods=['GET'])
 def get_profile(profile_id):
     try:
@@ -158,7 +169,7 @@ def create_post():
     
 
 @api.route('/feed_posts', methods=['GET'])
-def get_posts():
+def get_all_posts():
     try: 
 
        posts = FeedPost.query.all()
@@ -189,6 +200,37 @@ def get_post(post_id):
            return jsonify(post.serialize)
     except Exception as e:   
        return jsonify({"message": "Post no encontrado"}), 404
+
+@api.route('/favorite_elements', methods=['POST'])
+def create_favorite():
+    try:
+       data = request.get_json()
+       new_favorite = FavoriteElement(
+           user_id=data['user_id'],
+           element_type=data['element_type'],
+           element_id=data['element_id']
+    )
+       db.session.add(new_favorite)
+       db.session.commit()
+       return jsonify(new_favorite.serialize), 201
+    except Exception as e:   
+       return jsonify({"message": "Error al crear favoritos"}), 404
+
+
+@api.route('/users/<int:user_id>/favorites', methods=['GET'])
+def get_favorites(user_id):
+    try:
+       favorites = FavoriteElement.query.filter_by(user_id=user_id).all()
+       return jsonify([favorite.serialize for favorite in favorites])
+    
+    except Exception as e:   
+       return jsonify({"message": ""}), 404
+
+
+
+if __name__ == '__main__':
+    api.run(debug=True)      
+
 
 
 
