@@ -23,10 +23,14 @@ export const Navbar = () => {
 									<a class="nav-link" href="#">ABOUT US</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link" href="#">LIBRERY</a>
+									<a class="nav-link" href="#">LIBRARY</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link" href="#"><img src="https://i.pinimg.com/1200x/ac/ef/7a/acef7a10207e7d98a43b994e463afa27.jpg" className="mt-3 rounded-circle" alt="..." width="40px" height="40px" /></a>
+									<Link className="nav-link" to="/signup">SIGN UP</Link>
+								</li>
+								<li class="nav-item"></li>
+								<li class="nav-item">
+									<a class="nav-link" href="#"><img src="https://i.pinimg.com/736x/b1/40/cf/b140cf1ff6dfc4002d6ac79b12a40d92.jpg" className="mt-3 rounded-circle" alt="..." width="40px" height="40px" /></a>
 								</li>
 
 							</ul>
@@ -56,7 +60,7 @@ export const Navbar = () => {
 									<a class="nav-link" href="#">ABOUT US</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link" href="#">LIBRERY</a>
+									<a class="nav-link" href="#">LIBRARY</a>
 								</li>
 							</ul>
 							<form class="d-flex" role="search">
