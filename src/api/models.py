@@ -92,7 +92,7 @@ class FeedPost(db.Model):
     @property
     def serialize(self):
         return {
-            "post_id": self.profile_id,
+            "post_id": self.post_id,
             "user_id": self.user_id,
             "content_text": self.content_text,
             "created_at": self.created_at.isoformat() if self.created_at else None,
