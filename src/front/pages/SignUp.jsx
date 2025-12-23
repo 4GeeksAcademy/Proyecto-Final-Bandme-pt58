@@ -1,65 +1,90 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 
 export const SignUp = () => {
+	const [formData, setFormData] = useState({
+		username: "",
+		email: "",
+		password: "",
+		role: ""
+	});
+
+	const handleChange = (e) => {
+		setFormData({
+			...formData,
+			[e.target.id]: e.target.value
+		});
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+
+		const resp = await fetch("/signup", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData)
+		});
+
+		const data = await resp.json();
+
+		if (resp.ok)
+		{ 
+		console.log("Perfil creado:", data);
+		window.location.href = `/profile/${data.profile.profile_id}`;
+		}else {console.error(data);
+
+		}
+	};
+
 	return (
 		<>
-			<nav className="bg-dark text-light text-center py-2 mt-auto">
-				<div className="container-fluid">
-					<h1 className="navbar-brand text-center w-100 h1">BandMe</h1>
-				</div>
+			<nav className="bg-dark text-light text-center py-2">
+				<h1>BandMe</h1>
 			</nav>
-			<div>
-				<p className="text-center mt-3"><b>What kind of account would you like?</b></p>
-			</div>
+
+			<p className="text-center mt-3">
+				<b>What kind of account would you like?</b>
+			</p>
 
 			<div className="container mt-4">
-				<form className="row g-3">
-					<div className="col-md-12">
-						<label htmlFor="userName" className="form-label">
-							User name:
-						</label>
-						<input
-							type="text"
-							className="form-control"
-							id="userName"
-						/>
-					</div>
+				<form className="row g-3" onSubmit={handleSubmit}>
 
-					<div className="col-md-12">
-						<label htmlFor="inputEmail" className="form-label">
-							Email:
-						</label>
-						<input
-							type="email"
-							className="form-control"
-							id="inputEmail"
-						/>
-					</div>
+					<input
+						id="username"
+						className="form-control"
+						placeholder="Username"
+						onChange={handleChange}
+					/>
 
-					<div className="col-md-12">
-						<label htmlFor="inputPassword" className="form-label">
-							Password:
-						</label>
-						<input
-							type="password"
-							className="form-control"
-							id="inputPassword"
-						/>
-					</div>
-					<div className="col-md-12">
-						<label for="role" className="form-label">Role:</label>
-						<select id="role" className="form-select">
-							<option selected>Choose...</option>
-							<option>Musician</option>
-							<option>Band</option>
-							<option>Industry</option>
-						</select>
-					</div>
-					<div className="col-12">
-						<button type="submit" className="btn btn-secondary w-100">
-							Sign up
-						</button>
-					</div>
+					<input
+						id="email"
+						type="email"
+						className="form-control"
+						placeholder="Email"
+						onChange={handleChange}
+					/>
+
+					<input
+						id="password"
+						type="password"
+						className="form-control"
+						placeholder="Password"
+						onChange={handleChange}
+					/>
+
+					<select
+						id="role"
+						className="form-select"
+						onChange={handleChange}
+					>
+						<option value="">Choose...</option>
+						<option value="musician">Musician</option>
+						<option value="band">Band</option>
+						<option value="industry">Industry</option>
+					</select>
+
+					<button className="btn btn-secondary w-100">
+						Sign up
+					</button>
 				</form>
 			</div>
 		</>
