@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Profile } from "./Profile";
+import {useNavigate} from "react-router-dom";
+
 
 export const SignUp = () => {
 	const [formData, setFormData] = useState({
@@ -7,6 +10,8 @@ export const SignUp = () => {
 		password: "",
 		role: ""
 	});
+
+	const navigate = useNavigate()
 
 	const handleChange = (e) => {
 		setFormData({
@@ -17,23 +22,29 @@ export const SignUp = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
-		const resp = await fetch("/signup", {
+try{
+	    const backendUrl= import.meta.env.VITE_BACKEND_URL;
+		const resp = await fetch(`${backendUrl}/api/users`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(formData)
 		});
 
-		const data = await resp.json();
+if (!resp.ok){
+            const err = await resp.json()
+            alert (err.message || "signup failed" )
+            return
+        }
 
-		if (resp.ok)
-		{ 
-		console.log("Perfil creado:", data);
-		window.location.href = `/profile/${data.profile.profile_id}`;
-		}else {console.error(data);
+        alert ("signup successful, Please login")
+        navigate("/") 
 
-		}
-	};
+
+    } catch (error) {
+        console.error("signup error:", error)
+        alert ("signup failed")
+    }
+};
 
 	return (
 		<>
@@ -50,6 +61,7 @@ export const SignUp = () => {
 
 					<input
 						id="username"
+						value={formData.username}
 						className="form-control"
 						placeholder="Username"
 						onChange={handleChange}
@@ -79,10 +91,10 @@ export const SignUp = () => {
 						<option value="">Choose...</option>
 						<option value="musician">Musician</option>
 						<option value="band">Band</option>
-						<option value="industry">Industry</option>
+						<option value="enterprise">Enterprise</option>
 					</select>
 
-					<button className="btn btn-secondary w-100">
+					<button type="submit" className="btn btn-secondary w-100">
 						Sign up
 					</button>
 				</form>
@@ -90,3 +102,4 @@ export const SignUp = () => {
 		</>
 	);
 };
+
