@@ -29,7 +29,7 @@ def create_user():
        new_user = User(
        username=data['username'],
        email=data['email'],
-       password_hash=data['password_hash'],  # Asegúrate de usar un hash para la contraseña
+       password_hash=data['password'],  # Asegúrate de usar un hash para la contraseña
        role=data['role']
        
     )
