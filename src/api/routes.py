@@ -261,6 +261,30 @@ def update_post(post_id):
             
     except Exception as e:   
      return jsonify({"Internal Server Error" : str(e)}), 500
+    
+
+@api.route("/login", methods=["POST"])
+def login():
+    body = request.get_json()
+    if not body:
+        return jsonify({"msg": "No data received"}), 400
+
+    user = User.query.filter_by(email=body["email"]).first()
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    if user.password != body["password"]: 
+        return jsonify({"msg": "Wrong password"}), 401
+
+    profile = UserProfile.query.filter_by(user_id=user.id).first()
+    profile_id = profile.id if profile else None  
+
+    return jsonify({
+        "user_id": user.id,
+        "profile_id": profile_id
+    }), 200
+
+
 
 # @api.route('/feed_posts/<int:post_id>', methods=['GET'])
 # def get_post(post_id):
