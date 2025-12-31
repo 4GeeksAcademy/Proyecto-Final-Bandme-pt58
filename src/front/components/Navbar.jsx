@@ -51,7 +51,7 @@ export const Navbar = () => {
 						<div class="collapse navbar-collapse" id="navbarSupportedContent">
 							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 								<li class="nav-item">
-									<a class="nav-link active" aria-current="page" href="#">HOME</a>
+									<Link className="nav-link" to="/">HOME</Link>
 								</li>
 								<li class="nav-item">
 									<a class="nav-link" href="#">COMMUNITY</a>
@@ -63,9 +63,10 @@ export const Navbar = () => {
 									<a class="nav-link" href="#">LIBRARY</a>
 								</li>
 							</ul>
-							<form class="d-flex" role="search">
-								<button class="btn btn-outline-success" type="submit">LOGIN</button>
-							</form>
+							<div class="d-flex gap-2">
+								<Link to="/login" className="btn btn-outline-success">LOGIN</Link>
+								<Link to="/signup" className="btn btn-success">SIGN UP</Link>
+							</div>
 						</div>
 					</div>
 				</nav>
