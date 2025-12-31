@@ -2,10 +2,13 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint 
-from api.models import db, User, UserProfile, FeedPost, FavoriteElement
+from api.models import db, User, UserProfile, FeedPost, FavoriteElement, Like, Follower, MediaFile 
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from datetime import datetime
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 api = Blueprint('api', __name__)
 
@@ -25,27 +28,42 @@ def handle_hello():
 
 @api.route('/users', methods=['POST'])
 def create_user():
-    if not data or 'username' not in data or 'email' not in data or 'password_hash' not in data or 'role':
-       return jsonify({"message": "Datos Incompletos"}), 400
-    try:
-       data = request.get_json()
-       new_user = User(
-       username=data['username'],
-       email=data['email'],
-       password_hash=data['password_hash'],  
-       role=data['role']
-       
+    data= request.get_json()
+
+    if not data:
+        return jsonify({"msg": "no se proporcionaron datos"}), 400
+    
+    email= data.get("email")
+    username=data.get("username")
+    role = data.get("role")
+
+    existing_user= User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"msg": "ya existe un usuario con ese email"}), 409
+    
+    existing_user= User.query.filter_by(username=username).first()
+    if existing_user:
+        return jsonify({"msg": "ya existe un usuario con ese nombre de usuario"}), 409
+    
+    hashed_password = generate_password_hash(data["password_hash"])
+    
+    new_user=User(
+        username=username,
+        role=role,
+        email=email,
+        password_hash=hashed_password
     )
-       db.session.add(new_user)
-       db.session.commit()
-       return jsonify(new_user.serialize), 201
-       
-       
-
+    db.session.add(new_user)
+    
+    try:
+        db.session.commit()
+        return jsonify({"msg": "usuario creado con exito"}), 201
+    
     except Exception as e:
-        print(f"Error al crear usuario: {e}")
-        return jsonify({"Internal Server Error" : str(e)}), 500
-
+        print(f"Error al obtener usuarios: {e}")
+        return jsonify({"msg": "Internal Server Error", "error": str(e)}), 500
+       
+       
 
 @api.route('/users', methods=['GET'])
 def get_users():
@@ -271,10 +289,178 @@ def delete_post(post_id):
              db.session.delete(post)
              db.session.commit()
              return jsonify({"message": "Post eliminado con éxito"}), 200
-       return jsonify ({"message": "No se pudo eliminar el ppost"}), 404
+       return jsonify ({"message": "No se pudo eliminar el post"}), 404
     except Exception as e:  
         return jsonify({"Internal Server Error" : str(e)}), 500  
 
+
+@api.route('/post<int:post_id>/like', methods=['POST'])  
+def likes_post (post_id):
+   data = request.get_json()
+   if not data or 'user_id' not in data:
+      return jsonify ({"message": "User ID requerido"}), 400
+   try:
+      
+     new_like = Like(
+         user_id=data['user_id'],
+          updated_at=datetime.now(),
+         post_id = post_id
+      ) 
+
+     post = FeedPost.query.get(post_id)
+     post.likes_count += 1
+     
+     db.session.add(new_like)
+     db.session.commit()
+
+     return jsonify(new_like.serialize), 201
+
+   except Exception as e:  
+        return jsonify({"Internal Server Error" : str(e)}), 500  
+   
+
+@api.route("/post/<int:post_id>/like", methods=["DELETE"])
+def unlike_post(post_id):
+    data = request.get_json()
+    
+   
+          
+    like = Like.query.filter_by(
+        user_id=data["user_id"],
+        post_id=post_id
+    ).first()
+
+    if not like:
+        return jsonify({"msg": "Like no encontrado"}), 404
+
+    post = FeedPost.query.get(post_id)
+    post.likes_count -= 1
+
+    db.session.delete(like)
+    db.session.commit()
+
+    return jsonify({"msg": "Like eliminado"}), 200
+ 
+   
+
+@api.route('/favorite_element', methods=['POST'])
+def create_favorite():
+    if not data or 'user_id' not in data or 'element_type' not in data or 'element_id' not in data:
+       return jsonify({"message": "Datos Incompletos"}), 404
+    try:
+       data = request.get_json()
+       new_favorite = FavoriteElement(
+           user_id=data['user_id'],
+            updated_at=datetime.now(),
+           element_type=data['element_type'],
+           element_id=data['element_id']
+    )
+       db.session.add(new_favorite)
+       db.session.commit()
+       return jsonify(new_favorite.serialize), 201
+    except Exception as e:   
+        return jsonify({"Internal Server Error" : str(e)}), 500  
+
+
+@api.route('/user/<int:user_id>/favorites', methods=['DELETE'])
+def delete_favorites(user_id):
+    try:
+       favorites= FavoriteElement.query.get(user_id)
+       if favorites:
+             db.session.delete(user_id)
+             db.session.commit()
+             return jsonify({"message": "Favorito eliminado con éxito"}), 200
+       return jsonify ({"message": "No se pudo eliminar"}), 404
+    
+    except Exception as e:   
+        return jsonify({"Internal Server Error" : str(e)}), 500  
+
+
+@api.route("/posts/<int:post_id>/media", methods=["POST"])
+def add_media(post_id):
+    data = request.get_json()
+    try:
+     if not data or "file_url" not in data or "file_type" not in data:
+        return jsonify({"msg": "file_url y file_type son requeridos"}), 400
+
+     media = MediaFile(
+        post_id=post_id,
+        file_url=data["file_url"],
+        file_type=data["file_type"]
+    )
+
+     db.session.add(media)
+     db.session.commit()
+
+     return jsonify(media.serialize), 200 
+   
+    
+    except Exception as e:   
+     return jsonify({"Internal Server Error" : str(e)}), 500  
+    
+
+@api.route("/follow", methods=["POST"])
+def follow_user():
+    data = request.get_json()
+    try:
+     if not data or "follower_id" not in data:
+        return jsonify({"msg": "Datos incompletos"}), 400
+
+     follow = Follower(
+        follower_id=data["follower_id"],
+         updated_at=datetime.now()
+        
+    )
+
+     db.session.add(follow)
+     db.session.commit()
+
+     return jsonify(follow.serialize), 201
+
+    except Exception as e:   
+     return jsonify({"Internal Server Error" : str(e)}), 500  
+    
+
+@api.route("/follow", methods=["DELETE"])
+def unfollow_user():
+    data = request.get_json()
+    try:
+     follow = Follower.query.filter_by(
+        follower_id=data["follower_id"]
+       
+    ).first()
+
+     if not follow:
+        return jsonify({"msg": "Relación no encontrada"}), 404
+
+     db.session.delete(follow)
+     db.session.commit()
+     return jsonify({"msg": "Unfollow exitoso"}), 200
+    except Exception as e:   
+     return jsonify({"Internal Server Error" : str(e)}), 500
+
+
+@api.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(email=data["email"].lower()).first()  
+
+    if not user or not check_password_hash(user.password_hash, data["password_hash"]):
+      return  jsonify({"msg": " Email o Contraseña Invalidas"}), 401
+
+    access_token = create_access_token(identity=user.user_id)
+    return jsonify({"token": access_token,
+                    "message": "Logueado Con Éxito",
+                    "user": user.serialize}), 200
+
+
+@api.route("/protected", methods=["GET"])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+
+    
 
 
 
