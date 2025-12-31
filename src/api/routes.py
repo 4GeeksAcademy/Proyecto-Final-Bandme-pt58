@@ -28,30 +28,16 @@ def handle_hello():
 
 @api.route('/users', methods=['POST'])
 def create_user():
-    data= request.get_json()
-
-    if not data:
-        return jsonify({"msg": "no se proporcionaron datos"}), 400
+    if not data or 'username' not in data or 'email' not in data or 'password_hash' not in data or 'role':
+       return jsonify({"message": "Datos Incompletos"}), 400
     
-    email= data.get("email")
-    username=data.get("username")
-    role = data.get("role")
-
-    existing_user= User.query.filter_by(email=email).first()
-    if existing_user:
-        return jsonify({"msg": "ya existe un usuario con ese email"}), 409
-    
-    existing_user= User.query.filter_by(username=username).first()
-    if existing_user:
-        return jsonify({"msg": "ya existe un usuario con ese nombre de usuario"}), 409
-    
-    hashed_password = generate_password_hash(data["password_hash"])
-    
-    new_user=User(
-        username=username,
-        role=role,
-        email=email,
-        password_hash=hashed_password
+    data = request.get_json()
+    new_user = User(
+    username=data['username'],
+    email=data['email'],
+    password_hash=data['password_hash'],  
+    role=data['role']
+       
     )
     db.session.add(new_user)
     
@@ -72,22 +58,19 @@ def get_users():
        return jsonify([user.serialize for user in users]), 200
     
     except Exception as e:
-        return jsonify({"msg": "Internal Server Error",
-            "error": str(e)
-        }), 500
+        print(f"Error al obtener los usuario: {e}")
+        return jsonify({"msg": "Internal Server Error", "error": str(e)}), 
 
 
 @api.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-   try:
+    try:
        user = User.query.get(user_id)
-       if user is None:
-        return jsonify({"message": "Usuario no encontrado"}), 400
-       return jsonify(user.serialize), 200
-   except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+       if user:
+        return jsonify(user.serialize)
+    except Exception as e:
+     return jsonify({"message": "Usuario no encontrado"}), 404
+    
 
 
 @api.route('/users/<int:user_id>', methods=['PUT'])
@@ -124,14 +107,10 @@ def delete_user(user_id):
             "error": str(e)
         }), 500
         
-@api.route('/user_profile', methods=['POST'])
+@api.route('/user_profiles', methods=['POST'])
 def create_profile():
-    data = request.get_json()
-
-    if not data or 'user_id' not in data:
-     return jsonify({"message": "user_id es requerido"}), 400
     try:
-       
+       data = request.get_json()
        new_profile = UserProfile(
         user_id=data['user_id'],
         display_name=data['display_name'],
@@ -155,7 +134,7 @@ def create_profile():
         }), 500
     
 
-@api.route('/user_profile', methods=['GET'])
+@api.route('/user_profiles', methods=['GET'])
 def get_profiles():
     try:
        profiles = UserProfile.query.all()
@@ -167,7 +146,7 @@ def get_profiles():
         }), 500  
     
 
-@api.route('/user_profile/<int:profile_id>', methods=['GET'])
+@api.route('/user_profiles/<int:profile_id>', methods=['GET'])
 def get_profile(profile_id):
     try:
        profile = UserProfile.query.get(profile_id)
@@ -181,10 +160,10 @@ def get_profile(profile_id):
         }), 500  
 
 
-@api.route('/user_profile/<int:profile_id>', methods=['PUT'])
+@api.route('/user_profiles', methods=['PUT'])
 def update_profile(profile_id):     
     try:
-         data =  request.get_json()
+         data =  request.get.json()
          profile = UserProfile.query.get(profile_id)
          if profile:
             profile.display_name=data.get('display_name', profile.display_name),
@@ -226,7 +205,7 @@ def create_post():
     if not data or 'user_id' not in data or 'content_text' not in data:
        return jsonify({"message": "Datos incompletos"}), 400
     try:
-     
+       data = request.get_json()
        new_post = FeedPost(
           user_id=data['user_id'],
           updated_at=datetime.now(),
@@ -268,8 +247,8 @@ def get_post(post_id):
 @api.route('/feed_posts/<int:post_id>', methods=['PUT'])
 def update_post(post_id):
     try: 
-        data = request.get_json()
-        post = FeedPost.query.get(post_id)
+        data = request.get.json()
+        post = post.query.get(post_id)
         if post:
            post.content_text = data.get('content_text', post.content_text)
            db.session.commit()
@@ -279,10 +258,8 @@ def update_post(post_id):
     except Exception as e:   
      return jsonify({"Internal Server Error" : str(e)}), 500
 
-    
-
-@api.route('/feed_posts/<int:post_id>', methods=['DELETE'])
-def delete_post(post_id):
+@api.route('/feed_posts/<int:post_id>', methods=['GET'])
+def get_post(post_id):
     try:
        post = FeedPost.query.get(post_id)
        if post:

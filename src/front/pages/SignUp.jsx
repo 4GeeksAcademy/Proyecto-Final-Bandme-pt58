@@ -1,67 +1,105 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Profile } from "./Profile";
+import {useNavigate} from "react-router-dom";
+
 
 export const SignUp = () => {
+	const [formData, setFormData] = useState({
+		username: "",
+		email: "",
+		password: "",
+		role: ""
+	});
+
+	const navigate = useNavigate()
+
+	const handleChange = (e) => {
+		setFormData({
+			...formData,
+			[e.target.id]: e.target.value
+		});
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+try{
+	    const backendUrl= import.meta.env.VITE_BACKEND_URL;
+		const resp = await fetch(`${backendUrl}/api/users`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData)
+		});
+
+if (!resp.ok){
+            const err = await resp.json()
+            alert (err.message || "signup failed" )
+            return
+        }
+
+        alert ("signup successful, Please login")
+        navigate("/") 
+
+
+    } catch (error) {
+        console.error("signup error:", error)
+        alert ("signup failed")
+    }
+};
+
 	return (
 		<>
-			<nav className="bg-dark text-light text-center py-2 mt-auto">
-				<div className="container-fluid">
-					<h1 className="navbar-brand text-center w-100 h1">BandMe</h1>
-				</div>
+			<nav className="bg-dark text-light text-center py-2">
+				<h1>BandMe</h1>
 			</nav>
-			<div>
-				<p className="text-center mt-3"><b>What kind of account would you like?</b></p>
-			</div>
+
+			<p className="text-center mt-3">
+				<b>What kind of account would you like?</b>
+			</p>
 
 			<div className="container mt-4">
-				<form className="row g-3">
-					<div className="col-md-12">
-						<label htmlFor="userName" className="form-label">
-							User name:
-						</label>
-						<input
-							type="text"
-							className="form-control"
-							id="userName"
-						/>
-					</div>
+				<form className="row g-3" onSubmit={handleSubmit}>
 
-					<div className="col-md-12">
-						<label htmlFor="inputEmail" className="form-label">
-							Email:
-						</label>
-						<input
-							type="email"
-							className="form-control"
-							id="inputEmail"
-						/>
-					</div>
+					<input
+						id="username"
+						value={formData.username}
+						className="form-control"
+						placeholder="Username"
+						onChange={handleChange}
+					/>
 
-					<div className="col-md-12">
-						<label htmlFor="inputPassword" className="form-label">
-							Password:
-						</label>
-						<input
-							type="password"
-							className="form-control"
-							id="inputPassword"
-						/>
-					</div>
-					<div className="col-md-12">
-						<label for="role" className="form-label">Role:</label>
-						<select id="role" className="form-select">
-							<option selected>Choose...</option>
-							<option>Musician</option>
-							<option>Band</option>
-							<option>Industry</option>
-						</select>
-					</div>
-					<div className="col-12">
-						<button type="submit" className="btn btn-secondary w-100">
-							Sign up
-						</button>
-					</div>
+					<input
+						id="email"
+						type="email"
+						className="form-control"
+						placeholder="Email"
+						onChange={handleChange}
+					/>
+
+					<input
+						id="password"
+						type="password"
+						className="form-control"
+						placeholder="Password"
+						onChange={handleChange}
+					/>
+
+					<select
+						id="role"
+						className="form-select"
+						onChange={handleChange}
+					>
+						<option value="">Choose...</option>
+						<option value="musician">Musician</option>
+						<option value="band">Band</option>
+						<option value="enterprise">Enterprise</option>
+					</select>
+
+					<button type="submit" className="btn btn-secondary w-100">
+						Sign up
+					</button>
 				</form>
 			</div>
 		</>
 	);
 };
+
