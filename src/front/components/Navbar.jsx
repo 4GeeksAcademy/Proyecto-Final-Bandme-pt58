@@ -14,7 +14,7 @@ export const Navbar = () => {
 						<div class="collapse navbar-collapse" id="navbarSupportedContent">
 							<ul class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center align-items-center">
 								<li class="nav-item">
-									<a class="nav-link active" aria-current="page" href="#">HOME</a>
+									<Link className="nav-link" to="/">HOME</Link>
 								</li>
 								<li class="nav-item">
 									<a class="nav-link" href="#">COMMUNITY</a>
@@ -29,10 +29,9 @@ export const Navbar = () => {
 									<Link className="nav-link" to="/signup">SIGN UP</Link>
 								</li>
 								<li class="nav-item"></li>
-								<li class="nav-item">
+								{/* <li class="nav-item">
 									<a class="nav-link" href="#"><img src="https://i.pinimg.com/736x/b1/40/cf/b140cf1ff6dfc4002d6ac79b12a40d92.jpg" className="mt-3 rounded-circle" alt="..." width="40px" height="40px" /></a>
-								</li>
-
+								</li> */}
 							</ul>
 							<form class="d-flex" role="search">
 								<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
@@ -52,6 +51,7 @@ export const Navbar = () => {
 							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 								<li class="nav-item">
 									<a class="nav-link active" aria-current="page" href="#">HOME</a>
+									<Link className="nav-link" to="/">HOME</Link>
 								</li>
 								<li class="nav-item">
 									<a class="nav-link" href="#">COMMUNITY</a>
@@ -66,6 +66,10 @@ export const Navbar = () => {
 							<form class="d-flex" role="search">
 								<button class="btn btn-outline-success" type="submit">LOGIN</button>
 							</form>
+							<div class="d-flex gap-2">
+								<Link to="/login" className="btn btn-outline-success">LOGIN</Link>
+								<Link to="/signup" className="btn btn-success">SIGN UP</Link>
+							</div>
 						</div>
 					</div>
 				</nav>

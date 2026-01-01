@@ -19,40 +19,40 @@ export const Profile = () => {
           <p className="d-inline-flex gap-1">
             <button className="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">Folow</button>
 
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Message</button>
+            <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Message</button>
 
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
+            <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
 
-                    <div class="modal-title fs-5" id="exampleModalLabel">
-                      <div class="d-flex flex-row align-items-center gap-2 justify-content-end me-2">
-                        <h1 class="fs-5 mb-0">Message</h1>
-                        <i class="fa-solid fa-phone-volume"></i>
-                        <i class="fa-solid fa-video"></i>
+                    <div className="modal-title fs-5" id="exampleModalLabel">
+                      <div className="d-flex flex-row align-items-center gap-2 justify-content-end me-2">
+                        <h1 className="fs-5 mb-0">Message</h1>
+                        <i className="fa-solid fa-phone-volume"></i>
+                        <i className="fa-solid fa-video"></i>
                       </div>
 
-                      <div class="d-flex flex-row justify-content-between align-items-center mb-2">
-                        <div class="d-flex flex-row align-items-center">
-                          <img class="border rounded-circle profile-img" src="https://i.pinimg.com/200x/ac/ef/7a/acef7a10207e7d98a43b994e463afa27.jpg" />
-                          <h1 class="fs-5 ms-2 mb-0">@Richar_navarromusic</h1>
+                      <div className="d-flex flex-row justify-content-between align-items-center mb-2">
+                        <div className="d-flex flex-row align-items-center">
+                          <img className="border rounded-circle profile-img" src="https://i.pinimg.com/200x/ac/ef/7a/acef7a10207e7d98a43b994e463afa27.jpg" />
+                          <h1 className="fs-5 ms-2 mb-0">@Richar_navarromusic</h1>
                         </div>
                       </div>
                     </div>
 
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                  <div class="modal-body">
+                  <div className="modal-body">
                     <form>
-                      <div class="mb-3">
-                        <textarea class="form-control" id="message-text"></textarea>
+                      <div className="mb-3">
+                        <textarea className="form-control" id="message-text"></textarea>
                       </div>
                     </form>
                   </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Send <i class="fa-solid fa-paper-plane"></i></button>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" className="btn btn-primary">Send <i className="fa-solid fa-paper-plane"></i></button>
                   </div>
                 </div>
               </div>
@@ -272,7 +272,7 @@ export const Profile = () => {
 
       return (
       <div className="container mt-4">
-        <h2 className="mb-3">Mapa de Chapinero</h2>
+        <h1 className="mb-3">Friends Map</h1>
         <div
           id="map"
           style={{
@@ -284,17 +284,6 @@ export const Profile = () => {
         ></div>
       </div>
       );
-
-
-    
-
-
-
-
-
-
-
-
 
 
     </div>
