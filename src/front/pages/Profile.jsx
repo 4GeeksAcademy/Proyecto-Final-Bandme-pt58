@@ -4,6 +4,9 @@ import { useParams } from "react-router-dom";
 export const Profile = () => {
   const { profile_id } = useParams();
   const [profile, setProfile] = useState(null);
+  
+  console.log("profile_id desde la URL:", profile_id);
+
 
   useEffect(() => {
     fetch(`/user_profiles/${profile_id}`)

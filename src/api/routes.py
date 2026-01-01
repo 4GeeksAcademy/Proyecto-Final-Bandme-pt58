@@ -25,10 +25,18 @@ def handle_hello():
 
 @api.route('/users', methods=['POST'])
 def create_user():
-    if not data or 'username' not in data or 'email' not in data or 'password_hash' not in data or 'role':
+      
+    data = request.get_json() 
+
+    if "username" not in data or "email" not in data or "password" not in data or "role" not in data:
        return jsonify({"message": "Datos Incompletos"}), 400
+    
+    user_exist = User.query.filter_by(email=data["email"]).first()
+    if user_exist:
+       return jsonify({"message": "No se pudo registrar el usuario"}), 400
+       
     try:
-       data = request.get_json()
+     
        new_user = User(
        username=data['username'],
        email=data['email'],
@@ -253,18 +261,42 @@ def update_post(post_id):
             
     except Exception as e:   
      return jsonify({"Internal Server Error" : str(e)}), 500
+    
 
-@api.route('/feed_posts/<int:post_id>', methods=['GET'])
-def get_post(post_id):
-    try:
-       post = FeedPost.query.get(post_id)
-       if post:
-             db.session.delete(post)
-             db.session.commit()
-             return jsonify({"message": "Post eliminado con éxito"}), 200
-       return jsonify ({"message": "No se pudo eliminar el ppost"}), 404
-    except Exception as e:  
-        return jsonify({"Internal Server Error" : str(e)}), 500  
+@api.route("/login", methods=["POST"])
+def login():
+    body = request.get_json()
+    if not body:
+        return jsonify({"msg": "No data received"}), 400
+
+    user = User.query.filter_by(email=body["email"]).first()
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    if user.password != body["password"]: 
+        return jsonify({"msg": "Wrong password"}), 401
+
+    profile = UserProfile.query.filter_by(user_id=user.id).first()
+    profile_id = profile.id if profile else None  
+
+    return jsonify({
+        "user_id": user.id,
+        "profile_id": profile_id
+    }), 200
+
+
+
+# @api.route('/feed_posts/<int:post_id>', methods=['GET'])
+# def get_post(post_id):
+#     try:
+#        post = FeedPost.query.get(post_id)
+#        if post:
+#              db.session.delete(post)
+#              db.session.commit()
+#              return jsonify({"message": "Post eliminado con éxito"}), 200
+#        return jsonify ({"message": "No se pudo eliminar el ppost"}), 404
+#     except Exception as e:  
+#         return jsonify({"Internal Server Error" : str(e)}), 500  
 
 
 
