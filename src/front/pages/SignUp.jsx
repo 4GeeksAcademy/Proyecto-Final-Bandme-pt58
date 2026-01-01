@@ -22,6 +22,7 @@ export const SignUp = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		console.log(formData)
 try{
 	    const backendUrl= import.meta.env.VITE_BACKEND_URL;
 		const resp = await fetch(`${backendUrl}/api/users`, {
