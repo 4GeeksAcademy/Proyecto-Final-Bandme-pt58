@@ -45,6 +45,17 @@ def sign_up():
     email=data['email'],
     password_hash=hashed_password,  
     role=data['role']
+    user_exist = User.query.filter_by(email=data["email"]).first()
+    if user_exist:
+       return jsonify({"message": "No se pudo registrar el usuario"}), 400
+       
+    try:
+     
+       new_user = User(
+       username=data['username'],
+       email=data['email'],
+       password_hash=data['password'],  # Asegúrate de usar un hash para la contraseña
+       role=data['role']
        
     )
     db.session.add(new_user)
