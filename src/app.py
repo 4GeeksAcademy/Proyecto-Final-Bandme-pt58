@@ -28,8 +28,8 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////tmp/test.db"
 
 
-# Setup the Flask-JWT-Extended extension
-app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+
+app.config["JWT_SECRET_KEY"] = "super-secret"  
 jwt = JWTManager(app)    
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

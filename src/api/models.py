@@ -126,17 +126,33 @@ class MediaFile(db.Model):
 class Follower(db.Model):
     __tablename__ = "followers"
 
-    follower_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
-    followed_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    follower_id: Mapped[int] = mapped_column(
+        ForeignKey("users.user_id"), nullable=False
+    )
+    followed_id: Mapped[int] = mapped_column(
+        ForeignKey("users.user_id"), nullable=False
+    )
+
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    __table_args__ = (
+        db.UniqueConstraint("follower_id", "followed_id", name="uq_follower_pair"),
+    )
+
+    follower = relationship("User", foreign_keys=[follower_id])
+    followed = relationship("User", foreign_keys=[followed_id])
 
     @property
     def serialize(self):
         return {
+            "id": self.id,
             "follower_id": self.follower_id,
             "followed_id": self.followed_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+
 
 class Like(db.Model):
     __tablename__ = "likes"
@@ -145,6 +161,15 @@ class Like(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False)
     post_id: Mapped[int] = mapped_column(ForeignKey("feed_posts.post_id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())
+
+    __table_args__ = (
+    db.UniqueConstraint('user_id', 'post_id', name='unique_user_post_like'),
+)
+    
+
+
+    
 
     user = relationship("User", back_populates="likes")
     post = relationship("FeedPost", back_populates="likes")
