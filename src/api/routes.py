@@ -35,7 +35,7 @@ def create_user():
        return jsonify({"message": "Datos Incompletos"}), 400
     
     data = request.get_json()
-    new_user = User(
+    new_user = User
     username=data['username'],
     email=data['email'],
     password_hash=data['password_hash'],  
