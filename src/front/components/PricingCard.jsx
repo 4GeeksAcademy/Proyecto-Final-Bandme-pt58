@@ -14,8 +14,8 @@ export default function PricingCard({ title, price, features }) {
                         ))}
                     </ul>
 
-                    <a href="#" className="card-link">Card link</a>
-                    <a href="#" className="card-link">Another link</a>
+                    <a href="#" className="card-link">Start Free Trial</a>
+                    <a href="#" className="card-link">Sign up on this plan</a>
 
 
                 </div>
