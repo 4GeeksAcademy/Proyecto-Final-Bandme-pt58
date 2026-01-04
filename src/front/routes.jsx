@@ -13,6 +13,7 @@ import { SignUp } from "./pages/SignUp";
 import { Profile } from "./pages/Profile";
 import { Login } from "./pages/Login";
 import PricingPage from "./pages/PricingPage";
+import AboutUs from "./pages/AboutUs";
 
 
 export const router = createBrowserRouter(
@@ -34,6 +35,7 @@ export const router = createBrowserRouter(
       <Route path="/profile/:profile_id" element={<Profile />} />
       <Route path="/login" element={<Login />} />
       <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/aboutus" element={<AboutUs />} />
     </Route>
   )
 );
