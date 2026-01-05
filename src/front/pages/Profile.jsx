@@ -10,11 +10,13 @@ export const Profile = () => {
 
   useEffect(() => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    
       fetch(`${backendUrl}/api/user_profiles/${profile_id}`)
       .then(resp => resp.json())
       .then(data => setProfile(data))
       .catch(err => console.error(err));
   }, [profile_id]);
+
 
   if (!profile) {
     return <h2 className="text-center mt-5">Loading profile...</h2>;
