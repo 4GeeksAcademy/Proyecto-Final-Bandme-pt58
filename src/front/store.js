@@ -33,6 +33,25 @@ export default function storeReducer(store, action = {}) {
         ...store,
         todos: store.todos.map((todo) => (todo.id === id ? { ...todo, background: color } : todo))
       };
+       case "login_success":
+      localStorage.setItem("token", action.payload.token);
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      return {
+        ...store,
+        token: action.payload.token,
+        user: action.payload.user,
+        isAuthenticated: true,
+      };
+
+    case "logout":
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      return {
+        ...store,
+        token: null,
+        user: null,
+        isAuthenticated: false,
+      };
     default:
       throw Error('Unknown action.');
   }    

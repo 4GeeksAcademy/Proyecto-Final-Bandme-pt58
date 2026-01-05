@@ -5,11 +5,12 @@ export const Profile = () => {
   const { profile_id } = useParams();
   const [profile, setProfile] = useState(null);
   
-  console.log("profile_id desde la URL:", profile_id);
+
 
 
   useEffect(() => {
-    fetch(`/user_profiles/${profile_id}`)
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      fetch(`${backendUrl}/api/user_profiles/${profile_id}`)
       .then(resp => resp.json())
       .then(data => setProfile(data))
       .catch(err => console.error(err));
