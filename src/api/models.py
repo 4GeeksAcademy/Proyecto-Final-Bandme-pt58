@@ -40,7 +40,7 @@ class UserProfile(db.Model):
     profile_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False)
 
-    display_name: Mapped[str] = mapped_column(String(100))
+    display_name: Mapped[str] = mapped_column(String(100), nullable=True)
     bio: Mapped[str] = mapped_column(Text)
     genre: Mapped[str] = mapped_column(String(50))
     instrument: Mapped[str] = mapped_column(String(50))

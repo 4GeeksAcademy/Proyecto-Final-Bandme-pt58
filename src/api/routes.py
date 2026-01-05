@@ -26,49 +26,79 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+
+
 @api.route('/users', methods=['POST'])
 def sign_up():
     data = request.get_json()
-    email= data.get("email")
 
-    if not data or 'username' not in data or 'email' not in data or 'password_hash' not in data or 'role' not in data:
-       return jsonify({"message": "Datos Incompletos"}), 400
     
-    existing_user= User.query.filter_by(email=email).first()
+    if not data:
+        return jsonify({"message": "No se enviaron datos"}), 400
+
+    required_fields = ['username', 'email', 'password_hash', 'role']
+    if not all(field in data for field in required_fields):
+        return jsonify({"message": "Datos incompletos"}), 400
+
+    
+    existing_user = User.query.filter_by(email=data['email']).first()
     if existing_user:
-        return jsonify({"msg": "ya existe un usuario con ese email"}), 409
+        return jsonify({"message": "Ya existe un usuario con ese email"}), 409
     
-    hashed_password = generate_password_hash(data["password_hash"])
+      
+
+    
+    hashed_password = generate_password_hash(data['password_hash'])
+
     
     new_user = User(
-    username=data['username'],
-    email=data['email'],
-    password_hash=hashed_password,  
-    role=data['role']
-    user_exist = User.query.filter_by(email=data["email"]).first()
-    if user_exist:
-       return jsonify({"message": "No se pudo registrar el usuario"}), 400
-       
-    try:
-     
-       new_user = User(
-       username=data['username'],
-       email=data['email'],
-       password_hash=data['password'],  # Asegúrate de usar un hash para la contraseña
-       role=data['role']
-       
+        username=data['username'],
+        email=data['email'],
+        password_hash=hashed_password,
+        role=data['role']
     )
+
     db.session.add(new_user)
-    
+#     db.session.flush()
+
+#     existing_profile = UserProfile.query.filter_by(
+#     user_id=new_user.user_id
+# ).first()
+
+#     if existing_profile:
+#      return jsonify({"error": "User already has profile"}), 400
+
+
+#     profile = UserProfile(
+#      user_id=new_user.user_id,
+#      display_name=new_user.username or "user"
+# )
+
+#     db.session.add(profile)
+    db.session.commit()
+
     try:
-        db.session.commit()
-        return jsonify({"new_user":new_user.serialize,"message": "Usuario Creado Con Éxito" }), 201
-       
-    
+        
+         
+        return jsonify({
+
+            "message": "Usuario creado con éxito",
+            "user": new_user.serialize,
+            # "profile_id": profile.profile_id
+            
+        }), 201
+
     except Exception as e:
-        print(f"Error al obtener usuarios: {e}")
-        return jsonify({"msg": "Internal Server Error", "error": str(e)}), 500
-       
+        db.session.rollback()   
+        import traceback
+        traceback.print_exc()
+
+        print(f"Error al crear usuario: {e}")
+        return jsonify({
+            "message": "Internal Server Error",
+            "error": str(e)
+        }), 500
+        
        
 
 @api.route('/users', methods=['GET'])
@@ -371,16 +401,17 @@ def unlike_post(post_id):
 
    
 @api.route('/feed_posts/favorites', methods=['POST'])
+@jwt_required()
 def create_favorite():
-    if not data or 'user_id' not in data or 'element_type' not in data or 'element_id' not in data:
+    data = request.get_json()
+    user_id = get_jwt_identity() 
+    if not data or 'element_type' not in data or 'element_id' not in data:
        return jsonify({"message": "Datos Incompletos"}), 404
     try:
-       data = request.get_json()
        new_favorite = FavoriteElement(
-           user_id=data['user_id'],
-           updated_at=datetime.now(),
+           user_id=user_id,
            element_type=data['element_type'],
-           element_id=data['element_id']
+           element_id=data['element_id']    
     )
        db.session.add(new_favorite)
        db.session.commit()
@@ -389,15 +420,17 @@ def create_favorite():
         return jsonify({"Internal Server Error" : str(e)}), 500  
 
 
-@api.route('/feed_posts/favorites/<int:user_id>', methods=['DELETE'])
-def delete_favorites(user_id):
+@api.route('/feed_posts/favorites/<int:favorite_id>', methods=['DELETE'])
+@jwt_required()
+def delete_favorites(favorite_id):
+    user_id = get_jwt_identity()
     try:
-       favorites= FavoriteElement.query.get(user_id)
+       favorites= FavoriteElement.query.filter_by(favorite_id=favorite_id, user_id=user_id).first()
        if favorites:
-             db.session.delete(user_id)
+             db.session.delete(favorites)
              db.session.commit()
              return jsonify({"message": "Favorito eliminado con éxito"}), 200
-       return jsonify ({"message": "No se pudo eliminar"}), 404
+       return jsonify ({"message": "Favorito No Encontrado"}), 404
     
     except Exception as e:   
         return jsonify({"Internal Server Error" : str(e)}), 500  
@@ -502,18 +535,42 @@ def unfollow_user(user_id):
      return jsonify({"Internal Server Error" : str(e)}), 500
 
 
+# @api.route("/login", methods=["POST"])
+# def login():
+#     data = request.get_json()
+#     user = User.query.filter_by(email=data["email"].lower()).first()  
+
+#     if not user or not check_password_hash(user.password_hash, data["password_hash"]):
+#       return  jsonify({"msg": " Email o Contraseña Invalidas"}), 401
+
+#     access_token = create_access_token(identity=str(user.user_id))
+#     return jsonify({"token": access_token,
+#                     "message": "Logueado Con Éxito",
+#                     "user": user.serialize}), 200
+
 @api.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
-    user = User.query.filter_by(email=data["email"].lower()).first()  
 
-    if not user or not check_password_hash(user.password_hash, data["password_hash"]):
-      return  jsonify({"msg": " Email o Contraseña Invalidas"}), 401
+    if not data or "email" not in data or "password_hash" not in data:
+        return jsonify({"msg": "Datos incompletos"}), 400
 
-    access_token = create_access_token(identity=str(user.user_id))
-    return jsonify({"token": access_token,
-                    "message": "Logueado Con Éxito",
-                    "user": user.serialize}), 200
+    user = User.query.filter_by(email=data["email"].lower()).first()
+
+    if not user:
+        return jsonify({"msg": "Usuario no existe"}), 404
+
+    if not check_password_hash(user.password_hash, data["password_hash"]):
+        return jsonify({"msg": "Contraseña incorrecta"}), 401
+
+    access_token = create_access_token(identity=str(user.email))
+
+    return jsonify({
+        "token": access_token,
+         "message": "logged in ssuccesfully",
+        "user": user.serialize
+        
+    }), 200                    
 
 
 @api.route("/protected", methods=["GET"])
