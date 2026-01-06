@@ -20,7 +20,10 @@ export const Navbar = () => {
 									<a className="nav-link" href="#">COMMUNITY</a>
 								</li>
 								<li className="nav-item">
-									<a className="nav-link" href="#">ABOUT US</a>
+									<Link className="nav-link" to="/aboutus">ABOUT US</Link>
+								</li>
+								<li className="nav-item">
+									<Link className="nav-link" to="/pricing">PRICING</Link>
 								</li>
 								<li className="nav-item">
 									<Link className="nav-link" to="/login">LOGIN</Link>

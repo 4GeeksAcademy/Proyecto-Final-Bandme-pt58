@@ -8,6 +8,14 @@ export default function PricingPage() {
 
             <div className="row">
                 <PricingCard
+                    title="Free"
+                    price="$0"
+                    features={[
+                        "Limited Posts",
+                        "Endless Networking Possibilities"
+                    ]}
+                />
+                <PricingCard
                     title="Basic"
                     price="$6"
                     features={[
