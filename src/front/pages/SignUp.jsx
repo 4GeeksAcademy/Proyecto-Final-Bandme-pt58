@@ -36,10 +36,6 @@ if (!resp.ok){
             alert (err.message || "signup failed" )
             return
         }
-		
-		if (!user.profile_id) {
-  navigate(`/create-profile?user_id=${user.user_id}`);
-}
 
         alert ("Signup Successful, Please login")
         navigate("/login") 
