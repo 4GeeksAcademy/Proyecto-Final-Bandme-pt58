@@ -20,67 +20,64 @@ export const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    try {
-       const backendUrl= import.meta.env.VITE_BACKEND_URL;
-		   const resp = await fetch(`${backendUrl}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
+  try {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+    const resp = await fetch(`${backendUrl}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData)
+    });
 
-      if (resp.status === 404) {
-        setError("Usuario no existe");
-        return;
-      }
-
-      
-      if (!resp.ok) {
-        let errorMsg = "Error del servidor";
-        try {
-          const data = await resp.json();
-          errorMsg = data.msg || errorMsg;
-        } catch {
-          errorMsg = `Error del servidor: ${resp.status}`;
-        }
-        setError(errorMsg);
-        return;
-      }
-
-      const data = await resp.json();
-      
-      
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      
-      const user = data.user;
-      if (user?.profile_id) { navigate(/profile/`${user.profile_id}`); }
-      else if (user?.user_id && !user.profile_id) { setError("Usuario sin perfil. Debes crear tu perfil primero."); }
-      else { setError("Error inesperado del servidor");}
-
-      dispatch({
-      
-        type: "login_success",
-        payload: {
-          token: data.token,
-                    user: data.user
-                }    
-              });    
-              
-              navigate(`/profile/${resp.profile_id}`)
-              
-              
-              
-              
-              
-    } catch (err) {
-      console.error("Error en fetch:", err);
-      setError("No se pudo conectar con el servidor");
+    if (resp.status === 404) {
+      setError("Usuario no existe");
+      return;
     }
-  };
+
+    if (!resp.ok) {
+      let errorMsg = "Error del servidor";
+      try {
+        const data = await resp.json();
+        errorMsg = data.msg || errorMsg;
+      } catch {
+        errorMsg = `Error del servidor: ${resp.status}`;
+      }
+      setError(errorMsg);
+      return;
+    }
+
+    const data = await resp.json();
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    dispatch({
+      type: "login_success",
+      payload: {
+        token: data.token,
+        user: data.user
+      }
+    });
+
+    const user = data.user;
+
+    if (user?.profile_id) {
+      navigate(`/profile/${user.profile_id}`);
+    } else if (user?.user_id && !user.profile_id) {
+      setError("Usuario sin perfil. Debes crear tu perfil primero.");
+    } else {
+      setError("Error inesperado del servidor");
+    }
+
+  } catch (err) {
+    console.error("Error en fetch:", err);
+    setError("No se pudo conectar con el servidor");
+  }
+};
+
 
   return (
     <>
