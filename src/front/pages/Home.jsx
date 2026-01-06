@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import PostsCard from "../components/PostsCards.jsx";
 
 export const Home = () => {
 
@@ -31,4 +32,55 @@ export const Home = () => {
 	useEffect(() => {
 		loadMessage()
 	}, [])
-}; 
+
+
+	const posts = [
+		{
+			img: "",
+			title: "Event",
+			text: "Text"
+		},
+		{
+			img: "",
+			title: "Event",
+			text: "Text"
+		},
+		{
+			img: "",
+			title: "Event",
+			text: "Text"
+		},
+		{
+			img: "",
+			title: "Event",
+			text: "Text"
+		},
+		{
+			img: "",
+			title: "Event",
+			text: "Text"
+		},
+		{
+			img: "",
+			title: "Event",
+			text: "Text"
+		},
+	];
+
+	return (
+		<div className="container py-5">
+			<h2 className="text-center mb-4">Latest Posts</h2>
+			<div className="row justify-content-center">
+				{posts.map((post, index) => (
+					<PostsCard
+						key={index}
+						image={post.img}
+						title={post.title}
+						text={post.text}
+					/>
+				))}
+			</div>
+		</div>
+	);
+};
+
