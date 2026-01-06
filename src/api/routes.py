@@ -46,56 +46,22 @@ def sign_up():
         return jsonify({"message": "Ya existe un usuario con ese email"}), 409
     
       
-
-    
-    data = request.get_json()
-    new_user = User
-    username=data['username'],
-    email=data['email'],
-    password_hash=data['password_hash'],  
-    role=data['role']
-    user_exist = User.query.filter_by(email=data["email"]).first()
-    if user_exist:
-       return jsonify({"message": "No se pudo registrar el usuario"}), 400
-       
     try:
-     
-       new_user = User(
-       username=data['username'],
-       email=data['email'],
-       password_hash=data['password'],  # Asegúrate de usar un hash para la contraseña
-       role=data['role']
-       
-    hashed_password = generate_password_hash(data['password_hash'])
+        hashed_password = generate_password_hash(data['password_hash'])
 
-    
-    new_user = User(
-        username=data['username'],
-        email=data['email'],
-        password_hash=hashed_password,
-        role=data['role']
-    )
+        
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            password_hash=hashed_password,
+            role=data['role']
+        )
 
-    db.session.add(new_user)
-#     db.session.flush()
+        db.session.add(new_user)
 
-#     existing_profile = UserProfile.query.filter_by(
-#     user_id=new_user.user_id
-# ).first()
+        db.session.commit()
 
-#     if existing_profile:
-#      return jsonify({"error": "User already has profile"}), 400
-
-
-#     profile = UserProfile(
-#      user_id=new_user.user_id,
-#      display_name=new_user.username or "user"
-# )
-
-#     db.session.add(profile)
-    db.session.commit()
-
-    try:
+  
         
          
         return jsonify({

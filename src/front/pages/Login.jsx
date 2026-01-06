@@ -64,9 +64,9 @@ export const Login = () => {
 
     const user = data.user;
 
-    if (user?.profile_id) {
-      navigate(`/profile/${user.profile_id}`);
-    } else if (user?.user_id && !user.profile_id) {
+    if (user) {
+      navigate(`/profile/${user.user_id}`);
+    } else if (user?.user_id){
       setError("Usuario sin perfil. Debes crear tu perfil primero.");
     } else {
       setError("Error inesperado del servidor");

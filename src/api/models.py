@@ -32,6 +32,7 @@ class User(db.Model):
         "role": self.role,
         "created_at": self.created_at.isoformat() if self.created_at else None,
         "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        "profile": self.profile.serialize() if self.profile else None,
         }
 
 class UserProfile(db.Model):
