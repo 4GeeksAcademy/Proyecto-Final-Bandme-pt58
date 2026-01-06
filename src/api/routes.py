@@ -30,14 +30,13 @@ def handle_hello():
 
 @api.route('/users', methods=['POST'])
 def sign_up():
-    data = request.get_json()
-
-    
+ data = request.get_json()
+ try: 
     if not data:
-        return jsonify({"message": "No se enviaron datos"}), 400
+    return jsonify({"message": "No se enviaron datos"}), 400
 
-    required_fields = ['username', 'email', 'password_hash', 'role']
-    if not all(field in data for field in required_fields):
+     required_fields = ['username', 'email', 'password_hash', 'role']
+     if not all(field in data for field in required_fields):
         return jsonify({"message": "Datos incompletos"}), 400
 
     
@@ -48,24 +47,6 @@ def sign_up():
       
 
     
-    data = request.get_json()
-    new_user = User
-    username=data['username'],
-    email=data['email'],
-    password_hash=data['password_hash'],  
-    role=data['role']
-    user_exist = User.query.filter_by(email=data["email"]).first()
-    if user_exist:
-       return jsonify({"message": "No se pudo registrar el usuario"}), 400
-       
-    try:
-     
-       new_user = User(
-       username=data['username'],
-       email=data['email'],
-       password_hash=data['password'],  # Asegúrate de usar un hash para la contraseña
-       role=data['role']
-       
     hashed_password = generate_password_hash(data['password_hash'])
 
     
@@ -79,18 +60,17 @@ def sign_up():
     db.session.add(new_user)
     db.session.commit()
 
-    try:
+    
         
          
         return jsonify({
 
             "message": "Usuario creado con éxito",
             "user": new_user.serialize,
-            # "profile_id": profile.profile_id
+            
             
         }), 201
-
-    except Exception as e:
+   except Exception as e:
         db.session.rollback()   
         print(f"Error al crear usuario: {e}")
         return jsonify({
