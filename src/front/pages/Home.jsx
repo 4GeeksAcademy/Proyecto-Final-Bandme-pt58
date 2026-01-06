@@ -68,7 +68,7 @@ export const Home = () => {
 	];
 
 	return (
-		<div className="container py-5">
+		<div className="container py-5 ">
 			<h2 className="text-center mb-4">Latest Posts</h2>
 			<div className="row justify-content-center">
 				{posts.map((post, index) => (
