@@ -59,22 +59,6 @@ def sign_up():
     )
 
     db.session.add(new_user)
-#     db.session.flush()
-
-#     existing_profile = UserProfile.query.filter_by(
-#     user_id=new_user.user_id
-# ).first()
-
-#     if existing_profile:
-#      return jsonify({"error": "User already has profile"}), 400
-
-
-#     profile = UserProfile(
-#      user_id=new_user.user_id,
-#      display_name=new_user.username or "user"
-# )
-
-#     db.session.add(profile)
     db.session.commit()
 
     try:
@@ -90,9 +74,6 @@ def sign_up():
 
     except Exception as e:
         db.session.rollback()   
-        import traceback
-        traceback.print_exc()
-
         print(f"Error al crear usuario: {e}")
         return jsonify({
             "message": "Internal Server Error",
@@ -535,18 +516,7 @@ def unfollow_user(user_id):
      return jsonify({"Internal Server Error" : str(e)}), 500
 
 
-# @api.route("/login", methods=["POST"])
-# def login():
-#     data = request.get_json()
-#     user = User.query.filter_by(email=data["email"].lower()).first()  
 
-#     if not user or not check_password_hash(user.password_hash, data["password_hash"]):
-#       return  jsonify({"msg": " Email o Contraseña Invalidas"}), 401
-
-#     access_token = create_access_token(identity=str(user.user_id))
-#     return jsonify({"token": access_token,
-#                     "message": "Logueado Con Éxito",
-#                     "user": user.serialize}), 200
 
 @api.route("/login", methods=["POST"])
 def login():
