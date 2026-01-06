@@ -27,97 +27,41 @@ def handle_hello():
     return jsonify(response_body), 200
 
 
-
 @api.route('/users', methods=['POST'])
 def sign_up():
     data = request.get_json()
-
-    
     if not data:
         return jsonify({"message": "No se enviaron datos"}), 400
-
     required_fields = ['username', 'email', 'password_hash', 'role']
     if not all(field in data for field in required_fields):
         return jsonify({"message": "Datos incompletos"}), 400
-
-    
     existing_user = User.query.filter_by(email=data['email']).first()
     if existing_user:
         return jsonify({"message": "Ya existe un usuario con ese email"}), 409
-    
-      
-
-    
-    data = request.get_json()
-    new_user = User
-    username=data['username'],
-    email=data['email'],
-    password_hash=data['password_hash'],  
-    role=data['role']
-    user_exist = User.query.filter_by(email=data["email"]).first()
-    if user_exist:
-       return jsonify({"message": "No se pudo registrar el usuario"}), 400
-       
     try:
-     
-       new_user = User(
-       username=data['username'],
-       email=data['email'],
-       password_hash=data['password'],  # Asegúrate de usar un hash para la contraseña
-       role=data['role']
-       
-    hashed_password = generate_password_hash(data['password_hash'])
-
-    
-    new_user = User(
-        username=data['username'],
-        email=data['email'],
-        password_hash=hashed_password,
-        role=data['role']
-    )
-
-    db.session.add(new_user)
-#     db.session.flush()
-
-#     existing_profile = UserProfile.query.filter_by(
-#     user_id=new_user.user_id
-# ).first()
-
-#     if existing_profile:
-#      return jsonify({"error": "User already has profile"}), 400
-
-
-#     profile = UserProfile(
-#      user_id=new_user.user_id,
-#      display_name=new_user.username or "user"
-# )
-
-#     db.session.add(profile)
-    db.session.commit()
-
-    try:
-        
-         
+        hashed_password = generate_password_hash(data['password_hash'])
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            password_hash=hashed_password,
+            role=data['role']
+        )
+        db.session.add(new_user)
+        db.session.commit()
         return jsonify({
-
             "message": "Usuario creado con éxito",
             "user": new_user.serialize,
             # "profile_id": profile.profile_id
-            
         }), 201
-
     except Exception as e:
-        db.session.rollback()   
+        db.session.rollback()
         import traceback
         traceback.print_exc()
-
         print(f"Error al crear usuario: {e}")
         return jsonify({
             "message": "Internal Server Error",
             "error": str(e)
         }), 500
-        
-       
 
 @api.route('/users', methods=['GET'])
 def get_all_users():
@@ -588,7 +532,13 @@ def login():
          "message": "logged in ssuccesfully",
         "user": user.serialize
         
-    }), 200                    
+    }), 200    
+
+@api.route("/yt-search", methods=["POST"])
+def yt_search():
+    data = request.get_json()
+
+    context = data["context"]
 
 
 @api.route("/protected", methods=["GET"])
