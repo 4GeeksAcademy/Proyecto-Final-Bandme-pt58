@@ -32,7 +32,7 @@ export default function AboutUs() {
     ];
 
     return (
-        <div className="container py-5">
+        <div className="container py-5 text-light bg-dark">
             <h2 className="text-center mb-4">Get to know our Team</h2>
             <div className="row justify-content-center">
                 {teamMembers.map((member, index) => (
