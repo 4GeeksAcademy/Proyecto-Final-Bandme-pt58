@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from  "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Login = () => {
   const navigate = useNavigate();
+  const { dispatch } = useGlobalReducer();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password_hash: ""
   });
   const [error, setError] = useState("");
 
@@ -22,7 +24,8 @@ export const Login = () => {
     setError("");
 
     try {
-      const resp = await fetch("/login", {
+       const backendUrl= import.meta.env.VITE_BACKEND_URL;
+		   const resp = await fetch(`${backendUrl}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -48,20 +51,31 @@ export const Login = () => {
       }
 
       const data = await resp.json();
-
-
-      if (data.profile_id) {
-        navigate(`/profile/${data.profile_id}`);
-      } 
       
-      else if (data.user_id && !data.profile_id) {
-        setError("Usuario sin perfil. Debes crear tu perfil primero.");
-      } 
+      
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      const user = data.user;
+      if (user?.profile_id) { navigate(/profile/`${user.profile_id}`); }
+      else if (user?.user_id && !user.profile_id) { setError("Usuario sin perfil. Debes crear tu perfil primero."); }
+      else { setError("Error inesperado del servidor");}
 
-      else {
-        setError("Error inesperado del servidor");
-      }
-
+      dispatch({
+      
+        type: "login_success",
+        payload: {
+          token: data.token,
+                    user: data.user
+                }    
+              });    
+              
+              navigate(`/profile/${resp.profile_id}`)
+              
+              
+              
+              
+              
     } catch (err) {
       console.error("Error en fetch:", err);
       setError("No se pudo conectar con el servidor");
@@ -88,12 +102,12 @@ export const Login = () => {
           </div>
 
           <div className="col-md-12">
-            <label htmlFor="password" className="form-label">Password</label>
+            <label htmlFor="password_hash" className="form-label">Password</label>
             <input
               type="password"
               className="form-control"
-              id="password"
-              value={formData.password}
+              id="password_hash"
+              value={formData.password_hash}
               onChange={handleChange}
             />
           </div>

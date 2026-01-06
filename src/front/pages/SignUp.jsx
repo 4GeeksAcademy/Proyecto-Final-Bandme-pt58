@@ -7,7 +7,7 @@ export const SignUp = () => {
 	const [formData, setFormData] = useState({
 		username: "",
 		email: "",
-		password: "",
+		password_hash: "",
 		role: ""
 	});
 
@@ -25,7 +25,7 @@ export const SignUp = () => {
 		console.log(formData)
 try{
 	    const backendUrl= import.meta.env.VITE_BACKEND_URL;
-		const resp = await fetch(`${backendUrl}/api/users`, {
+		 const resp = await fetch(`${backendUrl}/api/users`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(formData)
@@ -37,8 +37,8 @@ if (!resp.ok){
             return
         }
 
-        alert ("signup successful, Please login")
-        navigate("/") 
+        alert ("Signup Successful, Please login")
+        navigate("/login") 
 
 
     } catch (error) {
@@ -70,6 +70,7 @@ if (!resp.ok){
 
 					<input
 						id="email"
+						value={formData.email}
 						type="email"
 						className="form-control"
 						placeholder="Email"
@@ -77,7 +78,8 @@ if (!resp.ok){
 					/>
 
 					<input
-						id="password"
+						id="password_hash"
+						value={formData.password_hash}
 						type="password"
 						className="form-control"
 						placeholder="Password"
