@@ -31,6 +31,7 @@ export const router = createBrowserRouter(
         <Route path="/signup" element={<SignUp />} />
         <Route path="/profile/:profile_id" element={<Profile />} />
        <Route path="/login" element={<Login />} />
+       <Route path="/profile" element={<Profile />} />
       </Route>
     )
 );
