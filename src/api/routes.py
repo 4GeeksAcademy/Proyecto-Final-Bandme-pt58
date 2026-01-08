@@ -8,7 +8,8 @@ from flask_cors import CORS
 from datetime import datetime
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import cloudinary.uploader
+import cloudinary
 
 api = Blueprint('api', __name__)
 
@@ -563,8 +564,22 @@ def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
-    
+@api.route('/upload-profile-image', methods=['POST'])
+def upload_profile_image():
+    user_id = request.form.get("profile_id")
+    file = request.files.get("file")
 
+    if not file:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    result = cloudinary.uploader.upload(file)
+    image_url = result["secure_url"]
+
+    user = User.query.get(user_id)
+    user.profile_image_url = image_url
+    db.session.commit()
+
+    return jsonify({"profile_image_url": image_url})
 
 
 

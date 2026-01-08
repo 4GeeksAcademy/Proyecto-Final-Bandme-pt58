@@ -14,6 +14,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(50), nullable=True, unique=True)
     password_hash: Mapped[str] = mapped_column(String(400), nullable=True)
     role: Mapped[str] = mapped_column(Enum("musician", "band", "enterprise", name="user_roles"), nullable=False)
+    profile_image_url = db.Column(db.String(500), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=True)
@@ -22,6 +23,9 @@ class User(db.Model):
     posts = relationship("FeedPost", back_populates="author")
     likes = relationship("Like", back_populates="user")
     favorites = relationship("FavoriteElement", back_populates="user")
+    tracks_count = db.Column(db.Integer, default=0)
+    followers_count = db.Column(db.Integer, default=0)
+    following_count = db.Column(db.Integer, default=0)
 
     @property
     def serialize(self):
