@@ -56,6 +56,26 @@ def sign_up():
             password_hash=hashed_password,
             role=data['role']
         )
+    if not data:
+        return jsonify({"message": "No se enviaron datos"}), 400
+    required_fields = ['username', 'email', 'password_hash', 'role']
+    if not all(field in data for field in required_fields):
+        return jsonify({"message": "Datos incompletos"}), 400
+    existing_user = User.query.filter_by(email=data['email']).first()
+    if existing_user:
+        return jsonify({"message": "Ya existe un usuario con ese email"}), 409
+    
+      
+    try:
+        hashed_password = generate_password_hash(data['password_hash'])
+
+        
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            password_hash=hashed_password,
+            role=data['role']
+        )
 
         
         db.session.add(new_user)
@@ -65,7 +85,6 @@ def sign_up():
             "message": "Usuario creado con éxito",
             "user": new_user.serialize
         }), 201
-
     except Exception as e:
         db.session.rollback()   
         print(f"Error al crear usuario: {e}")
@@ -535,7 +554,8 @@ def login():
          "message": "logged in ssuccesfully",
         "user": user.serialize
         
-    }), 200                    
+    }), 200    
+
 
 
 @api.route("/protected", methods=["GET"])
