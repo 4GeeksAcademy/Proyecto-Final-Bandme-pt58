@@ -28,55 +28,52 @@ def handle_hello():
 
 
 
+
 @api.route('/users', methods=['POST'])
 def sign_up():
- data = request.get_json()
- try: 
-    if not data:
-    return jsonify({"message": "No se enviaron datos"}), 400
-
-     required_fields = ['username', 'email', 'password_hash', 'role']
-     if not all(field in data for field in required_fields):
-        return jsonify({"message": "Datos incompletos"}), 400
-
+    data = request.get_json()
     
-    existing_user = User.query.filter_by(email=data['email']).first()
-    if existing_user:
-        return jsonify({"message": "Ya existe un usuario con ese email"}), 409
-    
-      
-
-    
-    hashed_password = generate_password_hash(data['password_hash'])
-
-    
-    new_user = User(
-        username=data['username'],
-        email=data['email'],
-        password_hash=hashed_password,
-        role=data['role']
-    )
-
-    db.session.add(new_user)
-    db.session.commit()
-
-    
+    try: 
         
-         
-        return jsonify({
+        if not data:
+            return jsonify({"message": "No se enviaron datos"}), 400
 
+        required_fields = ['username', 'email', 'password_hash', 'role']
+        if not all(field in data for field in required_fields):
+            return jsonify({"message": "Datos incompletos"}), 400
+
+        
+        existing_user = User.query.filter_by(email=data['email']).first()
+        if existing_user:
+            return jsonify({"message": "Ya existe un usuario con ese email"}), 409
+        
+        
+        hashed_password = generate_password_hash(data['password_hash'])
+        
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            password_hash=hashed_password,
+            role=data['role']
+        )
+
+        
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({
             "message": "Usuario creado con éxito",
-            "user": new_user.serialize,
-            
-            
+            "user": new_user.serialize
         }), 201
-   except Exception as e:
+
+    except Exception as e:
         db.session.rollback()   
         print(f"Error al crear usuario: {e}")
         return jsonify({
             "message": "Internal Server Error",
             "error": str(e)
         }), 500
+
         
        
 
