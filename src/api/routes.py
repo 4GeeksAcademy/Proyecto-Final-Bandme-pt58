@@ -38,16 +38,26 @@ def sign_up():
     existing_user = User.query.filter_by(email=data['email']).first()
     if existing_user:
         return jsonify({"message": "Ya existe un usuario con ese email"}), 409
+    
+      
     try:
         hashed_password = generate_password_hash(data['password_hash'])
+
+        
         new_user = User(
             username=data['username'],
             email=data['email'],
             password_hash=hashed_password,
             role=data['role']
         )
+
         db.session.add(new_user)
+
         db.session.commit()
+
+  
+        
+         
         return jsonify({
             "message": "Usuario creado con éxito",
             "user": new_user.serialize,

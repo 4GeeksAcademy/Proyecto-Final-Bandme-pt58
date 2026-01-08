@@ -34,21 +34,12 @@ export const Profile = () => {
             width="300px"
             height="300px"
           />
-
-          <h1 className="mt-3">
-            <i className="fa-solid fa-star"></i>
-            <i className="fa-solid fa-star"></i>
-            <i className="fa-solid fa-star"></i>
-            <i className="fa-solid fa-star-half"></i>
-            <i className="fa-regular fa-star"></i>
-          </h1>
-
           <p className="d-inline-flex gap-2">
-            <button className="btn btn-primary">Follow</button>
+            <button className="btn btn-secondary">Follow</button>
 
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-secondary"
               data-bs-toggle="modal"
               data-bs-target="#messageModal"
             >
@@ -60,15 +51,15 @@ export const Profile = () => {
         <div className="col-md-5 mt-5">
           <div className="card-body">
             <h1 className="card-title">{profile.display_name}</h1>
-            <h4>@user_{profile.user_id}</h4>
+            <h4>{profile.username}</h4>
             <p className="card-text">{profile.bio}</p>
             <p><strong>Location:</strong> {profile.location}</p>
           </div>
 
           <p className="d-inline-flex gap-2">
-            <button className="btn btn-primary">Tracks</button>
-            <button className="btn btn-primary">Followers</button>
-            <button className="btn btn-primary">Following</button>
+            <button className="btn btn-secondary">Tracks</button>
+            <button className="btn btn-secondary">Followers</button>
+            <button className="btn btn-secondary">Following</button>
           </p>
         </div>
       </div>
