@@ -534,11 +534,6 @@ def login():
         
     }), 200    
 
-@api.route("/yt-search", methods=["POST"])
-def yt_search():
-    data = request.get_json()
-
-    context = data["context"]
 
 
 @api.route("/protected", methods=["GET"])
