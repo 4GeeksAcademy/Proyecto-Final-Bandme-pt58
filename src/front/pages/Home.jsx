@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import PostsCard from "../components/PostsCards.jsx";
+import { MusicSearch } from "../components/MusicSearch.jsx";
 
 export const Home = () => {
 
@@ -80,6 +81,7 @@ export const Home = () => {
 					/>
 				))}
 			</div>
+			<MusicSearch/>
 		</div>
 	);
 };
