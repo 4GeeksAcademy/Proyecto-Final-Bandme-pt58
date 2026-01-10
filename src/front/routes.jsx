@@ -13,7 +13,7 @@ import { SignUp } from "./pages/SignUp";
 import { Profile } from "./pages/Profile";
 import { Login } from "./pages/Login";
 import PricingPage from "./pages/PricingPage";
-import AboutUs from "./pages/AboutUs";
+import  AboutUs  from "./pages/AboutUs";
 
 
 export const router = createBrowserRouter(

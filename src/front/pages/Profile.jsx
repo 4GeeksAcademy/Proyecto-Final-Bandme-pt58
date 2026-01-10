@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { UploadImg } from "../components/UploadImg";
 
 export const Profile = () => {
   const { profile_id } = useParams();
   const [profile, setProfile] = useState(null);
+  const [imgUrl, setImgUrl] = useState(null)
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -54,6 +56,7 @@ export const Profile = () => {
 
       <div className="row">
         <div className="col-md-4 text-start">
+        <UploadImg imgUrl={imgUrl} setImgUrl={setImgUrl} />
           <img
             src={profile.profile_image_url}
             className="mb-3 rounded-circle"

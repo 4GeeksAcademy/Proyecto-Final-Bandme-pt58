@@ -9,7 +9,7 @@ from datetime import datetime
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 import cloudinary.uploader
-import cloudinary
+
 
 api = Blueprint('api', __name__)
 
@@ -28,20 +28,14 @@ def handle_hello():
     return jsonify(response_body), 200
 
 
-
 @api.route('/users', methods=['POST'])
 def sign_up():
     data = request.get_json()
-
-    
     if not data:
         return jsonify({"message": "No se enviaron datos"}), 400
-
     required_fields = ['username', 'email', 'password_hash', 'role']
     if not all(field in data for field in required_fields):
         return jsonify({"message": "Datos incompletos"}), 400
-
-    
     existing_user = User.query.filter_by(email=data['email']).first()
     if existing_user:
         return jsonify({"message": "Ya existe un usuario con ese email"}), 409
@@ -66,25 +60,19 @@ def sign_up():
         
          
         return jsonify({
-
             "message": "Usuario creado con éxito",
             "user": new_user.serialize,
             # "profile_id": profile.profile_id
-            
         }), 201
-
     except Exception as e:
-        db.session.rollback()   
+        db.session.rollback()
         import traceback
         traceback.print_exc()
-
         print(f"Error al crear usuario: {e}")
         return jsonify({
             "message": "Internal Server Error",
             "error": str(e)
         }), 500
-        
-       
 
 @api.route('/users', methods=['GET'])
 def get_all_users():
@@ -555,7 +543,8 @@ def login():
          "message": "logged in ssuccesfully",
         "user": user.serialize
         
-    }), 200                    
+    }), 200    
+
 
 
 @api.route("/protected", methods=["GET"])
@@ -564,23 +553,12 @@ def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
-@api.route('/upload-profile-image', methods=['POST'])
-def upload_profile_image():
-    user_id = request.form.get("profile_id")
-    file = request.files.get("file")
-
-    if not file:
-        return jsonify({"error": "No file uploaded"}), 400
-
+@api.route('/uploadimg', methods=['POST'])
+def upload_image():
+    file = request.files['image']
     result = cloudinary.uploader.upload(file)
-    image_url = result["secure_url"]
-
-    user = User.query.get(user_id)
-    user.profile_image_url = image_url
-    db.session.commit()
-
-    return jsonify({"profile_image_url": image_url})
-
+    return result["secure_url"]
+   
 
 
 if __name__ == '__main__':

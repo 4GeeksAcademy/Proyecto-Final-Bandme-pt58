@@ -13,13 +13,6 @@ from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
 import cloudinary
 
-cloudinary.config(
-    cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    api_key = os.environ.get("CLOUDINARY_API_KEY"),
-    api_secret = os.environ.get("CLOUDINARY_API_SECRET"),
-    secure = True
-)
-
 
 # from models import Person
 
@@ -50,6 +43,13 @@ db.init_app(app)
 
 # add the admin
 setup_admin(app)
+
+cloudinary.config( 
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+    api_key = os.getenv("CLOUDINARY_API_KEY"), 
+    api_secret = os.getenv("CLOUDINARY_API_SECRET"),
+    secure = True
+)
 
 # add the admin
 setup_commands(app)
