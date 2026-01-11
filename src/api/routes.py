@@ -8,6 +8,7 @@ from flask_cors import CORS
 from datetime import datetime
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
+import cloudinary.uploader
 
 
 api = Blueprint('api', __name__)
@@ -545,9 +546,12 @@ def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
-    
-
-
+@api.route('/uploadimg', methods=['POST'])
+def upload_image():
+    file = request.files['image']
+    result = cloudinary.uploader.upload(file)
+    return result["secure_url"]
+   
 
 
 if __name__ == '__main__':

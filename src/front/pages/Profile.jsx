@@ -1,66 +1,96 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { UploadImg } from "../components/UploadImg";
 
 export const Profile = () => {
   const { profile_id } = useParams();
   const [profile, setProfile] = useState(null);
-  
+  const [imgUrl, setImgUrl] = useState(null)
 
-
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    
-      fetch(`${backendUrl}/api/user_profiles/${profile_id}`)
-      .then(resp => resp.json())
-      .then(data => setProfile(data))
-      .catch(err => console.error(err));
-  }, [profile_id]);
+    if (!profile_id) return;
 
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/user_profiles/${profile_id}`);
+        const data = await response.json();
+        setProfile(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchProfile();
+  }, [profile_id, backendUrl]);
 
   if (!profile) {
     return <h2 className="text-center mt-5">Loading profile...</h2>;
   }
 
-  return (
-    <div className="mb-3">
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-      <div className="row g-6">
-        <div className="col-md-5 mt-5 text-center">
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("user_id", profile_id); 
+
+    try {
+      const response = await fetch(`${backendUrl}/api/upload-profile-image`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+    
+      setProfile(prev => ({ ...prev, profile_image_url: data.profile_image_url }));
+    } catch (err) {
+      console.error("Error uploading image:", err);
+    }
+  };
+  return (
+    <div className="container">
+
+      <div className="row">
+        <div className="col-md-4 text-start">
+        <UploadImg imgUrl={imgUrl} setImgUrl={setImgUrl} />
           <img
             src={profile.profile_image_url}
-            className="mt-3 rounded-circle"
-            alt="profile"
+            className="mb-3 rounded-circle"
             width="300px"
             height="300px"
           />
-          <p className="d-inline-flex gap-2">
-            <button className="btn btn-secondary">Follow</button>
 
-            <button
-              type="button"
-              className="btn btn-secondary"
-              data-bs-toggle="modal"
-              data-bs-target="#messageModal"
-            >
-              Message
-            </button>
-          </p>
+          <div className="d-flex-justify-content-center mt-2  gap-2">
+            <button className="btn btn-secondary me-2">Follow</button>
+            <button className="btn btn-secondary">  Message</button>
+         </div>
         </div>
 
-        <div className="col-md-5 mt-5">
+        <div className="col-md-8">
           <div className="card-body">
             <h1 className="card-title">{profile.display_name}</h1>
-            <h4>{profile.username}</h4>
+            <h4 className="text muted">{profile.username}</h4>
             <p className="card-text">{profile.bio}</p>
-            <p><strong>Location:</strong> {profile.location}</p>
           </div>
 
-          <p className="d-inline-flex gap-2">
-            <button className="btn btn-secondary">Tracks</button>
-            <button className="btn btn-secondary">Followers</button>
-            <button className="btn btn-secondary">Following</button>
-          </p>
+          <div className="d-flex gap-4 me-auto">
+  <div className="text-center">
+    <h5>{profile.tracks_count}</h5>
+    <small>Tracks</small>
+  </div>
+  <div className="text-center">
+    <h5>{profile.followers_count}</h5>
+    <small>Followers</small>
+  </div>
+  <div className="text-center">
+    <h5>{profile.following_count}</h5>
+    <small>Following</small>
+  </div>
+</div>
         </div>
       </div>
 
@@ -82,7 +112,7 @@ export const Profile = () => {
         </li>
       </ul>
 
-   
+
       <div className="tab-content mt-4">
 
 
@@ -95,7 +125,7 @@ export const Profile = () => {
           />
         </div>
 
-        
+
         <div className="tab-pane fade" id="photos">
           <div className="row mt-3">
             <div className="col">
@@ -110,7 +140,7 @@ export const Profile = () => {
           </div>
         </div>
 
-      
+
         <div className="tab-pane fade" id="videos">
           <div className="row mt-3">
             <div className="col">
@@ -142,7 +172,7 @@ export const Profile = () => {
 
       </div>
 
-   
+
       <div className="modal fade" id="messageModal" tabIndex="-1">
         <div className="modal-dialog">
           <div className="modal-content">
