@@ -99,6 +99,8 @@ class FeedPost(db.Model):
             "post_id": self.post_id,
             "user_id": self.user_id,
             "content_text": self.content_text,
+            "image_url": self.image_url, 
+            "publish_home": self.publish_home,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "likes_count": self.likes_count,
