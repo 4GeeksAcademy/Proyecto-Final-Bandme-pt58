@@ -27,47 +27,55 @@ def handle_hello():
     return jsonify(response_body), 200
 
 
+
+
 @api.route('/users', methods=['POST'])
 def sign_up():
     data = request.get_json()
-    if not data:
-        return jsonify({"message": "No se enviaron datos"}), 400
-    required_fields = ['username', 'email', 'password_hash', 'role']
-    if not all(field in data for field in required_fields):
-        return jsonify({"message": "Datos incompletos"}), 400
-    existing_user = User.query.filter_by(email=data['email']).first()
-    if existing_user:
-        return jsonify({"message": "Ya existe un usuario con ese email"}), 409
+    
+    try: 
+        
+        if not data:
+            return jsonify({"message": "No se enviaron datos"}), 400
 
-    try:
+        required_fields = ['username', 'email', 'password_hash', 'role']
+        if not all(field in data for field in required_fields):
+            return jsonify({"message": "Datos incompletos"}), 400
+
+        
+        existing_user = User.query.filter_by(email=data['email']).first()
+        if existing_user:
+            return jsonify({"message": "Ya existe un usuario con ese email"}), 409
+        
+        
         hashed_password = generate_password_hash(data['password_hash'])
-
+        
         new_user = User(
             username=data['username'],
             email=data['email'],
             password_hash=hashed_password,
             role=data['role']
         )
+    
 
+        
         db.session.add(new_user)
-
         db.session.commit()
 
         return jsonify({
             "message": "Usuario creado con éxito",
-            "user": new_user.serialize,
-            # "profile_id": profile.profile_id
+            "user": new_user.serialize
         }), 201
     except Exception as e:
-        db.session.rollback()
-        import traceback
-        traceback.print_exc()
+        db.session.rollback()   
         print(f"Error al crear usuario: {e}")
         return jsonify({
             "message": "Internal Server Error",
             "error": str(e)
         }), 500
 
+        
+       
 
 @api.route('/users', methods=['GET'])
 def get_all_users():
@@ -414,52 +422,102 @@ def delete_favorites(favorite_id):
 
 @api.route('/feed_posts/mediafile', methods=["POST"])
 def add_media():
-    data = request.get_json()
     try:
-        if not data or "file_url" not in data or "file_type" not in data:
-            return jsonify({"msg": "file_url y file_type son requeridos"}), 400
+        post_id = request.form.get("post_id")
+        file = request.files.get("file")
+
+        if not post_id or not file:
+            return jsonify({"msg": "post_id y file son requeridos"}), 400
+
+        
+        if not file.mimetype.startswith(("image/", "video/")):
+            return jsonify({"msg": "Solo imagen o video"}), 400
+
+        upload_result = cloudinary.uploader.upload(
+            file,
+            resource_type="auto"
+        )
+
+        resource_type = upload_result["resource_type"]  
 
         media = MediaFile(
-            post_id=data['post_id'],
-            file_url=data["file_url"],
-            file_type=data["file_type"]
+            post_id=post_id,
+            file_url=upload_result["secure_url"],
+            file_type=resource_type
         )
 
         db.session.add(media)
         db.session.commit()
 
-        return jsonify(media.serialize), 200
+        return jsonify(media.serialize), 201
 
     except Exception as e:
-        return jsonify({"Internal Server Error": str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
+    
 
 @api.route('/feed_posts/mediafile/<int:media_id>', methods=["PUT"])
 def update_media(media_id):
-
     try:
-        data = request.get_json()
         media = MediaFile.query.get(media_id)
-        if media:
-            media.file_url = data.get('file_url', media.file_url)
-            media.file_type = data.get('file_type', media.file_type)
-            db.session.commit()
-            return jsonify(media.serialize), 200
-        return jsonify({"message": "No se pudo actualizar"}), 400
+        if not media:
+            return jsonify({"msg": "Media no encontrado"}), 404
+
+        post_id = request.form.get("post_id")
+        file = request.files.get("file")
+
+        
+        if post_id:
+            media.post_id = post_id
+
+        if file:
+            if not file.mimetype.startswith(("image/", "video/")):
+                return jsonify({"msg": "Solo imagen o video"}), 400
+
+            upload_result = cloudinary.uploader.upload(
+                file,
+                resource_type="auto"
+            )
+
+            resource_type = upload_result["resource_type"]
+
+            if resource_type not in ("image", "video"):
+                return jsonify({"msg": "Tipo no soportado"}), 400
+
+            media.file_url = upload_result["secure_url"]
+            media.file_type = resource_type
+            media.public_id = upload_result["public_id"]
+
+        db.session.commit()
+        return jsonify(media.serialize), 200
 
     except Exception as e:
-        return jsonify({"Internal Server Error": str(e)}), 500
+        return jsonify({"error": str(e)}), 500
+
 
 
 @api.route('/feed_posts/mediafile/<int:media_id>', methods=["DELETE"])
 def delete_media(media_id):
     try:
         media = MediaFile.query.get(media_id)
-        if media:
-            db.session.delete(media)
-            db.session.commit()
-            return jsonify({"message": "Eliminado con éxito"}), 200
-        return jsonify({"message": "No se pudo eliminar"}), 404
+        if not media:
+            return jsonify({"msg": "Media no encontrado"}), 404
+
+        
+        cloudinary.uploader.destroy(
+            media.public_id,
+            resource_type=media.file_type
+        )
+
+        
+        db.session.delete(media)
+        db.session.commit()
+
+        return jsonify({"msg": "Media eliminado correctamente"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
     except Exception as e:
         return jsonify({"Internal Server Error": str(e)}), 500
@@ -508,18 +566,7 @@ def unfollow_user(user_id):
         return jsonify({"Internal Server Error": str(e)}), 500
 
 
-# @api.route("/login", methods=["POST"])
-# def login():
-#     data = request.get_json()
-#     user = User.query.filter_by(email=data["email"].lower()).first()
 
-#     if not user or not check_password_hash(user.password_hash, data["password_hash"]):
-#       return  jsonify({"msg": " Email o Contraseña Invalidas"}), 401
-
-#     access_token = create_access_token(identity=str(user.user_id))
-#     return jsonify({"token": access_token,
-#                     "message": "Logueado Con Éxito",
-#                     "user": user.serialize}), 200
 
 @api.route("/login", methods=["POST"])
 def login():
