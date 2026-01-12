@@ -15,7 +15,7 @@ export const Profile = () => {
 
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${backendUrl}/api/user_profiles/${profile_id}`);
+        const response = await fetch(`${backendUrl}/api/user_profiles`);
         const data = await response.json();
         setProfile(data);
       } catch (err) {

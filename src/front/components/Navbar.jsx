@@ -52,7 +52,7 @@ export const Navbar = () => {
             {token && store.currentUser && (
               <li className="nav-item">
                 <Link className="nav-link" to={`/profile/${store.currentUser.id}`}>
-                  Profile
+                PROFILE
                 </Link>
               </li>
             )}

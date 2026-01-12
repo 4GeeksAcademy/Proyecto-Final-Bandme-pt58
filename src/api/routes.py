@@ -56,7 +56,6 @@ def sign_up():
         return jsonify({
             "message": "Usuario creado con éxito",
             "user": new_user.serialize,
-            # "profile_id": profile.profile_id
         }), 201
     except Exception as e:
         db.session.rollback()
@@ -165,13 +164,20 @@ def get_all_profiles():
                         }), 500
 
 
-@api.route('/user_profiles/<int:profile_id>', methods=['GET'])
-def get_profile(profile_id):
+@api.route('/user_profiles', methods=['GET'])
+@jwt_required()
+def get_profile():
     try:
-        profile = UserProfile.query.get(profile_id)
-        if profile:
-            return jsonify(profile.serialize), 200
-        return jsonify({"message": "Perfil no encontrado"}), 404
+        current_user = get_jwt_identity() 
+        print(current_user)
+        profile = UserProfile.query.filter_by(email=current_user).first
+        print(profile)
+        if not profile:
+            return jsonify({"msg": "usuario no encontrado"}), 404
+        user_profile = profile.profile
+        if not profile:
+            return jsonify({"message": "Perfil no encontrado"}), 404
+        return jsonify(user_profile.serialize()), 200
 
     except Exception as e:
         return jsonify({"msg": "Internal Server Error",
