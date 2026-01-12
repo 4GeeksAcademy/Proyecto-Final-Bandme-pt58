@@ -13,7 +13,9 @@ export const initialStore=()=>{
         background: null,
       }
     ],
-    currentUser: true
+    currentUser: null,
+    token: null,
+    isAuthenticated: false
   }
 }
 
@@ -35,21 +37,21 @@ export default function storeReducer(store, action = {}) {
       };
        case "login_success":
       localStorage.setItem("token", action.payload.token);
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem("currentUser", JSON.stringify(action.payload.user));
       return {
         ...store,
         token: action.payload.token,
-        user: action.payload.user,
+        currentUser: action.payload.user,
         isAuthenticated: true,
       };
 
     case "logout":
       localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      localStorage.removeItem("currentUser");
       return {
         ...store,
         token: null,
-        user: null,
+        currentUser: null,
         isAuthenticated: false,
       };
     default:
