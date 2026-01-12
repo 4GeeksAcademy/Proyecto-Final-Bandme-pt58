@@ -53,7 +53,6 @@ export const Profile = () => {
     }
   };
   return (
-
     <div className="container">
 
       <div className="row">
