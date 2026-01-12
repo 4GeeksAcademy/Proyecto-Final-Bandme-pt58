@@ -81,8 +81,9 @@ class FeedPost(db.Model):
 
     post_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False)
-
+    publish_home: Mapped[bool] = mapped_column(Boolean, default=False)   
     content_text: Mapped[str] = mapped_column(Text)
+    image_url: Mapped[str] = mapped_column(String(255), nullable=True) 
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
     likes_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -101,7 +102,8 @@ class FeedPost(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "likes_count": self.likes_count,
-            "media_files": [m.serialize for m in self.media_files]
+            "media_files": [m.serialize for m in self.media_files],
+            "publish_home": self.publish_home
         }
     
 class MediaFile(db.Model):
@@ -110,8 +112,9 @@ class MediaFile(db.Model):
     media_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     post_id: Mapped[int] = mapped_column(ForeignKey("feed_posts.post_id"), nullable=False)
 
-    file_url: Mapped[str] = mapped_column(String(200), nullable=False)
+    file_url: Mapped[str] = mapped_column(String(500), nullable=False)
     file_type: Mapped[str] = mapped_column(Enum("image", "video", "audio", name="media_types"))
+    public_id: Mapped[str] = mapped_column(String(200), nullable=False)
     uploaded_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     post = relationship("FeedPost", back_populates="media_files")

@@ -415,57 +415,102 @@ def delete_favorites(favorite_id):
 
 @api.route('/feed_posts/mediafile', methods=["POST"])
 def add_media():
-    data = request.get_json()
     try:
-     if not data or "file_url" not in data or "file_type" not in data:
-        return jsonify({"msg": "file_url y file_type son requeridos"}), 400
+        post_id = request.form.get("post_id")
+        file = request.files.get("file")
 
-     media = MediaFile(
-        post_id=data['post_id'],
-        file_url=data["file_url"],
-        file_type=data["file_type"]
-    )
+        if not post_id or not file:
+            return jsonify({"msg": "post_id y file son requeridos"}), 400
 
-     db.session.add(media)
-     db.session.commit()
+        
+        if not file.mimetype.startswith(("image/", "video/")):
+            return jsonify({"msg": "Solo imagen o video"}), 400
 
-     return jsonify(media.serialize), 200
+        upload_result = cloudinary.uploader.upload(
+            file,
+            resource_type="auto"
+        )
 
+        resource_type = upload_result["resource_type"]  
 
-    except Exception as e:   
-     return jsonify({"Internal Server Error" : str(e)}), 500
-   
+        media = MediaFile(
+            post_id=post_id,
+            file_url=upload_result["secure_url"],
+            file_type=resource_type
+        )
+
+        db.session.add(media)
+        db.session.commit()
+
+        return jsonify(media.serialize), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
     
 
-@api.route('/feed_posts/mediafile/<int:media_id>', methods=["PUT"])     
-def update_media (media_id):
-    
+@api.route('/feed_posts/mediafile/<int:media_id>', methods=["PUT"])
+def update_media(media_id):
     try:
-      data = request.get_json()
-      media = MediaFile.query.get(media_id)
-      if media:
-           media.file_url = data.get('file_url', media.file_url) 
-           media.file_type = data.get('file_type', media.file_type)
-           db.session.commit()
-           return jsonify (media.serialize), 200
-      return jsonify ({"message": "No se pudo actualizar"}), 400
+        media = MediaFile.query.get(media_id)
+        if not media:
+            return jsonify({"msg": "Media no encontrado"}), 404
 
-    except Exception as e:   
-     return jsonify({"Internal Server Error" : str(e)}), 500
+        post_id = request.form.get("post_id")
+        file = request.files.get("file")
+
+        
+        if post_id:
+            media.post_id = post_id
+
+        if file:
+            if not file.mimetype.startswith(("image/", "video/")):
+                return jsonify({"msg": "Solo imagen o video"}), 400
+
+            upload_result = cloudinary.uploader.upload(
+                file,
+                resource_type="auto"
+            )
+
+            resource_type = upload_result["resource_type"]
+
+            if resource_type not in ("image", "video"):
+                return jsonify({"msg": "Tipo no soportado"}), 400
+
+            media.file_url = upload_result["secure_url"]
+            media.file_type = resource_type
+            media.public_id = upload_result["public_id"]
+
+        db.session.commit()
+        return jsonify(media.serialize), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 
 @api.route('/feed_posts/mediafile/<int:media_id>', methods=["DELETE"])
-def delete_media (media_id):
+def delete_media(media_id):
     try:
-     media = MediaFile.query.get(media_id)
-     if media:
+        media = MediaFile.query.get(media_id)
+        if not media:
+            return jsonify({"msg": "Media no encontrado"}), 404
+
+        
+        cloudinary.uploader.destroy(
+            media.public_id,
+            resource_type=media.file_type
+        )
+
+        
         db.session.delete(media)
         db.session.commit()
-        return jsonify({"message": "Eliminado con éxito"}), 200
-     return jsonify ({"message": "No se pudo eliminar"}), 404
-    
-    except Exception as e:   
-        return jsonify({"Internal Server Error" : str(e)}), 500  
+
+        return jsonify({"msg": "Media eliminado correctamente"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 
 

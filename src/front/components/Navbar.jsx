@@ -1,10 +1,23 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { useContext } from "react";
+import { Context } from "../store/appContext";
+
 export const Navbar = () => {
-	const { store } = useGlobalReducer()
+	const { store, dispatch } = useGlobalReducer();
+	const { actions } = useContext(Context);
+	const navigate = useNavigate();
+
+	const handleSignout = () => {
+		dispatch({ type: "set_currentUser", payload: null });
+		localStorage.removeItem("token");
+		localStorage.removeItem("currentUser");
+		actions.logout?.();
+		navigate("/login");
+	}
 	return (
 		<nav className="navbar navbar-dark bg-dark text-white">
-			{store.currentUser ?
+			{store.currentUser ? (
 				<nav className="navbar navbar-expand-lg bg-dark navbar-dark w-100">
 					<div className="container-fluid">
 						<a className="navbar-brand" href="#">BANDME</a>
@@ -25,17 +38,6 @@ export const Navbar = () => {
 								<li className="nav-item">
 									<Link className="nav-link" to="/pricing">PRICING</Link>
 								</li>
-								<li className="nav-item">
-									<Link className="nav-link" to="/login">LOGIN</Link>
-								</li>
-								<li className="nav-item">
-									<Link className="nav-link" to="/signup">SIGN UP</Link>
-								</li>
-								<li className="nav-item"></li>
-								{/* <li class="nav-item">
-									<a class="nav-link" href="#"><img src="https://i.pinimg.com/736x/b1/40/cf/b140cf1ff6dfc4002d6ac79b12a40d92.jpg" className="mt-3 rounded-circle" alt="..." width="40px" height="40px" /></a>
-								</li> */}
-
 							</ul>
 							<form className="d-flex" role="search">
 								<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
@@ -44,7 +46,7 @@ export const Navbar = () => {
 						</div>
 					</div>
 				</nav>
-				:
+			) : (
 				<nav className="navbar navbar-expand-lg bg-dark navbar-dark w-100">
 					<div className="container-fluid">
 						<a className="navbar-brand" href="#">BANDME</a>
@@ -67,12 +69,13 @@ export const Navbar = () => {
 								</li>
 							</ul>
 							<form className="d-flex" role="search">
-								<button className="btn btn-outline-success" type="submit">LOGIN</button>
+								<Link className="btn btn-outline-success" to="/login">LOGIN</Link>
+								<Link className="btn btn-outline-primary ms-2" to="/signup">SIGN UP</Link>
 							</form>
 						</div>
 					</div>
 				</nav>
-			}
+			)}
 		</nav>
 	);
 };
