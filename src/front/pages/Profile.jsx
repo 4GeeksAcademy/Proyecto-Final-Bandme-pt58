@@ -193,8 +193,6 @@ export const Profile = () => {
         </div>
       </div>
 
-      //Modal CD
-
       <div className="mt-3">
         <button
           className="btn btn-primary"
