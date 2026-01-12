@@ -1,18 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
-
-
 export const Navbar = () => {
   const { store, dispatch } = useGlobalReducer();
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const handleSignout = () => {
-    dispatch({ type: "logout" });
+    dispatch({ type: "logout" }); 
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("user"); 
     navigate("/login");
   };
 
@@ -90,5 +87,5 @@ export const Navbar = () => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
