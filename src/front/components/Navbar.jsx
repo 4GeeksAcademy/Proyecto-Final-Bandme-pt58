@@ -1,11 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
-import { useContext } from "react";
-import { Context } from "../store/appContext";
+
 
 export const Navbar = () => {
 	const { store, dispatch } = useGlobalReducer();
-	const { actions } = useContext(Context);
 	const navigate = useNavigate();
 
 	const handleSignout = () => {

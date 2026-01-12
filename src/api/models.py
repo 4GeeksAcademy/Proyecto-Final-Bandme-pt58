@@ -3,6 +3,7 @@ from sqlalchemy import String, Boolean, Enum, Integer, Text, DateTime, ForeignKe
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from datetime import datetime
+ 
 
 db = SQLAlchemy()
 
@@ -24,6 +25,7 @@ class User(db.Model):
     posts = relationship("FeedPost", back_populates="author")
     likes = relationship("Like", back_populates="user")
     favorites = relationship("FavoriteElement", back_populates="user")
+    
 
     @property
     def serialize(self):
@@ -57,6 +59,7 @@ class UserProfile(db.Model):
     updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
 
     user = relationship("User", back_populates="profile")
+   
     
     @property
     def serialize(self):
@@ -211,3 +214,4 @@ class FavoriteElement(db.Model):
             "element_id": self.element_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+    

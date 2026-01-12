@@ -1,41 +1,58 @@
-import { useState } from "react"
+import { useState } from "react";
 
 export const UploadImg = ({ imgUrl, setImgUrl }) => {
-    const [file, setFile] = useState(null)
+  const [uploading, setUploading] = useState(false);
 
+  const handleUpload = async (file) => {
+    if (!file) return;
 
-    async function handleSubmit() {
-        if (!file) return
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "TU_UPLOAD_PRESET");
+    formData.append("resource_type", "auto");
 
-        const formData = new FormData()
-        formData.append("image", file)
+    try {
+      setUploading(true);
 
-        try {
-            console.log(file)
-            const backendUrl = import.meta.env.VITE_BACKEND_URL;
-            const response = await fetch(`${backendUrl}/api/uploadimg`, {
-                method: "POST",
-                body: formData
-            });
-
-            if (!response.ok) {
-            throw new Error("Error al subir imagen")
-            }
-
-            const data = await response.text()
-            setImgUrl(data)
-
-        } catch (error) {
-            console.log("error al cargar imagen", error)
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/TU_CLOUD_NAME/upload",
+        {
+          method: "POST",
+          body: formData,
         }
+      );
 
+      const data = await res.json();
+      setImgUrl(data.secure_url);
+
+    } catch (err) {
+      console.error("Error al subir archivo", err);
+    } finally {
+      setUploading(false);
     }
-    return (
-        <>
-            <input type="file" accept="image/*" name="image" id="image" onChange={(e) => setFile(e.target.files[0])} />
-            {imgUrl && <img src={imgUrl} alt="uploadimage" width={300} />}
-            <input type="button" value="Enviar" onClick={handleSubmit} />
-        </>
-    )
+  };
 
-} 
+  return (
+    <>
+      <label style={{ cursor: "pointer" }}>
+        📎
+        <input
+          type="file"
+          hidden
+          accept="image/*,video/*"
+          onChange={(e) => handleUpload(e.target.files[0])}
+        />
+      </label>
+
+      {uploading && <span>Subiendo...</span>}
+
+      {imgUrl && (
+        imgUrl.includes("video") ? (
+          <video src={imgUrl} controls width={300} />
+        ) : (
+          <img src={imgUrl} alt="preview" width={300} />
+        )
+      )}
+    </>
+  );
+};
