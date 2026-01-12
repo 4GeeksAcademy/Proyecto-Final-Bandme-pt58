@@ -32,7 +32,7 @@ export const Home = () => {
 		const loadPosts = async () => {
 			try {
 				const backendUrl = import.meta.env.VITE_BACKEND_URL;
-				const response = await fetch(backendUrl + "/feed_posts");
+				const response = await fetch(`${backendUrl}/api/feed_posts`);
 				const data = await response.json();
 
 				if (response.ok) setPosts(data);
