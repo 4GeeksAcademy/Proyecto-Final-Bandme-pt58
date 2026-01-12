@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 
@@ -8,11 +7,12 @@ export const Navbar = () => {
   const { store, dispatch } = useGlobalReducer();
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const handleSignout = () => {
-    dispatch({ type: "logout" }); 
+    dispatch({ type: "logout" });
     localStorage.removeItem("token");
-    localStorage.removeItem("user"); 
+    localStorage.removeItem("user");
     navigate("/login");
   };
 
@@ -33,7 +33,7 @@ export const Navbar = () => {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-         
+
           <ul className="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center align-items-center">
             <li className="nav-item">
               <Link className="nav-link" to="/">HOME</Link>
@@ -51,20 +51,20 @@ export const Navbar = () => {
               <Link className="nav-link" to="/pricing">PRICING</Link>
             </li>
 
-            
+
             {token && store.currentUser && (
               <li className="nav-item">
-                <Link className="nav-link" to={`/profile/${store.currentUser.id}`}>
-                  Profile
+                <Link className="nav-link" to={`/profile/${store.currentUser.user_id}`}>
+                  PROFILE
                 </Link>
               </li>
             )}
           </ul>
 
-          
+
           <ul className="navbar-nav ms-auto">
             {!token ? (
-              
+
               <>
                 <li className="nav-item">
                   <Link className="btn btn-outline-light me-2" to="/login">Login</Link>
@@ -74,12 +74,12 @@ export const Navbar = () => {
                 </li>
               </>
             ) : !store.currentUser ? (
-              
+
               <li className="nav-item">
                 <Link className="btn btn-outline-light" to="/login">Login</Link>
               </li>
             ) : (
-              
+
               <li className="nav-item">
                 <button className="btn btn-outline-light" onClick={handleSignout}>
                   Logout
