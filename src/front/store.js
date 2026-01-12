@@ -13,7 +13,9 @@ export const initialStore=()=>{
         background: null,
       }
     ],
-    currentUser: true
+    user: null,
+    token: null,
+    isAuthenticated: false
   }
 }
 
