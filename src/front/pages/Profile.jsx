@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UploadImg } from "../components/UploadImg";
+import PostCreation from "../components/PostCreation";
 
 export const Profile = () => {
   const { profile_id } = useParams();
@@ -35,7 +36,7 @@ export const Profile = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("user_id", profile_id); 
+    formData.append("user_id", profile_id);
 
     try {
       const response = await fetch(`${backendUrl}/api/upload-profile-image`, {
@@ -45,18 +46,19 @@ export const Profile = () => {
 
       const data = await response.json();
 
-    
+
       setProfile(prev => ({ ...prev, profile_image_url: data.profile_image_url }));
     } catch (err) {
       console.error("Error uploading image:", err);
     }
   };
   return (
+
     <div className="container">
 
       <div className="row">
         <div className="col-md-4 text-start">
-        <UploadImg imgUrl={imgUrl} setImgUrl={setImgUrl} />
+          <UploadImg imgUrl={imgUrl} setImgUrl={setImgUrl} />
           <img
             src={profile.profile_image_url}
             className="mb-3 rounded-circle"
@@ -67,7 +69,7 @@ export const Profile = () => {
           <div className="d-flex-justify-content-center mt-2  gap-2">
             <button className="btn btn-secondary me-2">Follow</button>
             <button className="btn btn-secondary">  Message</button>
-         </div>
+          </div>
         </div>
 
         <div className="col-md-8">
@@ -78,19 +80,19 @@ export const Profile = () => {
           </div>
 
           <div className="d-flex gap-4 me-auto">
-  <div className="text-center">
-    <h5>{profile.tracks_count}</h5>
-    <small>Tracks</small>
-  </div>
-  <div className="text-center">
-    <h5>{profile.followers_count}</h5>
-    <small>Followers</small>
-  </div>
-  <div className="text-center">
-    <h5>{profile.following_count}</h5>
-    <small>Following</small>
-  </div>
-</div>
+            <div className="text-center">
+              <h5>{profile.tracks_count}</h5>
+              <small>Tracks</small>
+            </div>
+            <div className="text-center">
+              <h5>{profile.followers_count}</h5>
+              <small>Followers</small>
+            </div>
+            <div className="text-center">
+              <h5>{profile.following_count}</h5>
+              <small>Following</small>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -186,6 +188,37 @@ export const Profile = () => {
             <div className="modal-footer">
               <button className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button className="btn btn-primary">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      //Modal CD
+
+      <div className="mt-3">
+        <button
+          className="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#postCreationModal"
+        >
+          Create Post
+        </button>
+      </div>
+
+
+      <div className="modal fade" id="postCreationModal" tabIndex="-1">
+        <div className="modal-dialog modal-lg"> {/* modal-lg for more space */}
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Create a New Post</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div className="modal-body">
+
+              <PostCreation userId={profile_id} />
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
