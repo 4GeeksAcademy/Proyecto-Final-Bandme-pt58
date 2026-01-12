@@ -13,7 +13,7 @@ export const initialStore=()=>{
         background: null,
       }
     ],
-    user: null,
+    currentUser: null,
     token: null,
     isAuthenticated: false
   }
@@ -41,7 +41,7 @@ export default function storeReducer(store, action = {}) {
       return {
         ...store,
         token: action.payload.token,
-        user: action.payload.user,
+        currentUser: action.payload.user,
         isAuthenticated: true,
       };
 
@@ -51,7 +51,7 @@ export default function storeReducer(store, action = {}) {
       return {
         ...store,
         token: null,
-        user: null,
+        currentUser: null,
         isAuthenticated: false,
       };
     default:
