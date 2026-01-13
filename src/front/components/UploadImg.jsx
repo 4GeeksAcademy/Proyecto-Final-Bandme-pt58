@@ -13,19 +13,19 @@ export const UploadImg = ({ imgUrl, setImgUrl }) => {
                 body: formData
             });
             if (!response.ok) {
-            throw new Error("Error al subir imagen")
+            throw new Error("Failed by uploading image")
             }
             const data = await response.text()
             setImgUrl(data)
         } catch (error) {
-            console.log("error al cargar imagen", error)
+            console.log("Failed by uploading image", error)
         }
     }
     return (
         <>
             <input type="file" accept="image/*" name="image" id="image" onChange={(e) => setFile(e.target.files[0])} />
             {imgUrl && <img src={imgUrl} alt="uploadimage" width={300} />}
-            <input type="button" value="Enviar" onClick={handleSubmit} />
+            <input type="button" value="Send" onClick={handleSubmit} />
         </>
     )
 }

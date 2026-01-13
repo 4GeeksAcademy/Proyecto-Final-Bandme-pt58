@@ -274,18 +274,38 @@ def get_post(post_id):
         return jsonify({"Internal Server Error": str(e)}), 500
 
 
+# @api.route('/feed_posts/<int:post_id>', methods=['PUT'])
+# def update_post(post_id):
+#     try:
+#         data = request.get.json()
+#         post = post.query.get(post_id)
+#         if post:
+#             post.content_text = data.get('content_text', post.content_text)
+#             #post.updated_at=datetime.now(),
+#             #post.image_url=data.get('image_url', post.image_url),
+#             #post.publish_home=data.get('publish_home', post.publish_home)
+#             db.session.commit()
+#             return jsonify(post.serialize), 200
+#         return jsonify({"message": "No se pudo actualizar el post"}), 400
+
+#     except Exception as e:
+#         return jsonify({"Internal Server Error": str(e)}), 500
+
 @api.route('/feed_posts/<int:post_id>', methods=['PUT'])
 def update_post(post_id):
     try:
-        data = request.get.json()
-        post = post.query.get(post_id)
+        data = request.get_json() 
+        post = db.session.get(FeedPost, post_id) 
+        
         if post:
+            
             post.content_text = data.get('content_text', post.content_text)
             db.session.commit()
-            return jsonify(post.serialize), 200
-        return jsonify({"message": "No se pudo actualizar el post"}), 400
-
+            return jsonify({"post": post.serialize, "message": "Post actualizado"}), 200
+            
+        return jsonify({"message": "Post no encontrado"}), 404
     except Exception as e:
+        db.session.rollback()
         return jsonify({"Internal Server Error": str(e)}), 500
 
 
