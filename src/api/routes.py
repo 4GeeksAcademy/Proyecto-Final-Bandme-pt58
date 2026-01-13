@@ -559,6 +559,15 @@ def upload_image():
     result = cloudinary.uploader.upload(file)
     return result["secure_url"]
 
+@api.route('/users/<int:user_id>/posts', methods=['GET'])
+def get_user_posts(user_id):
+    try:
+        
+        posts = FeedPost.query.filter_by(user_id=user_id).all()
+        return jsonify([post.serialize for post in posts]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     api.run(debug=True)
