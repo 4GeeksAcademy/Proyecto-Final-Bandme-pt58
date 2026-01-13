@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UploadImg } from "./UploadImg";
 
-export default function PostCreation({ userId, onPostCreated,  }) {   //postId
+export default function PostCreation({ userId, onPostCreated,  }) {  
     const [text, setText] = useState("");
     const [imgUrl, setImgUrl] = useState("");
     const [publishHome, setPublishHome] = useState(false)
@@ -31,7 +31,7 @@ export default function PostCreation({ userId, onPostCreated,  }) {   //postId
                     onPostCreated(); 
                 }
                 
-                console.log("¡Post creado y lista actualizada!");
+                console.log("The post was created and the list was updated");
             }
         } catch (error) {
             console.error("Error saving post:", error);

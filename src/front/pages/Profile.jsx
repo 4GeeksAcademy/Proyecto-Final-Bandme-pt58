@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { json, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { UploadImg } from "../components/UploadImg";
 import PostCreation from "../components/PostCreation";
 import PostsCard from "../components/PostsCards.jsx";
+import { ProfileForm } from "../components/ProfileForm.jsx"
+
 
 export const Profile = () => {
   const { user_id } = useParams();
@@ -24,42 +26,70 @@ export const Profile = () => {
     }
   };
 
+
+  const fetchProfile = async () => {
+    try {
+
+      const resUser = await fetch(`${backendUrl}/api/users/${user_id}`);
+      const userData = await resUser.json();
+
+
+      const resInfo = await fetch(`${backendUrl}/api/user_profiles/user/${user_id}`);
+
+      if (resInfo.ok) {
+        const infoData = await resInfo.json();
+
+
+        setProfile({
+          ...userData,
+          profile: infoData
+        });
+      } else {
+
+        setProfile({
+          ...userData,
+          profile: null
+        });
+      }
+    } catch (error) {
+      console.error("Error by uploading the data:", error);
+    }
+  };
+
+  const handleProfileUpdate = () => {
+    console.log("Updating the profile view...");
+    fetchProfile();
+  };
+
+
   const handleUpdate = async (url) => {
     try {
       const response = await fetch(`${backendUrl}/api/users/${user_id}`, {
         method: "PUT",
-        body: JSON.stringify({profile_image_url: url}),
-        headers: {"Content-Type" : "application/json"}
-      })
-      if (response.ok){
+        body: JSON.stringify({ profile_image_url: url }),
+        headers: { "Content-Type": "application/json" }
+      });
+      if (response.ok) {
         const data = await response.json();
-        setProfile(data)
+        setProfile(data);
       }
     } catch (error) {
-      console.error("Error al cargar imagen:", err);
-      
+      console.error("Error al cargar imagen:", error);
     }
-  }
-
+  };
   useEffect(() => {
-    if (!user_id) return;
-
-    const fetchProfile = async () => {
-      const res = await fetch(`${backendUrl}/api/users/${user_id}`);
-      const data = await res.json();
-      console.log(data)
-      setProfile(data);
-    };
-
-    fetchProfile();
-    loadUserPosts();
+    if (user_id) {
+      fetchProfile();
+      loadUserPosts();
+    }
   }, [user_id]);
 
-  useEffect(() =>{
-    if(imgUrl){
-      handleUpdate(imgUrl)
+  useEffect(() => {
+    if (imgUrl) {
+      handleUpdate(imgUrl);
     }
-  }, [imgUrl])
+  }, [imgUrl]);
+
 
   if (!profile) return <div className="text-center mt-5">Loading...</div>;
 
@@ -86,13 +116,68 @@ export const Profile = () => {
             <h4 className="text-muted"><i className="fa-solid fa-envelope"></i> {profile.email}</h4>
             <h4 className="text-muted">{profile.role}</h4>
 
+            {profile.profile ? (
+              <div className="card shadow-sm border-0 mt-3" style={{ background: "#f8f9fa" }}>
+                <div className="card-body">
+                  <h5 className="border-bottom pb-2 text-primary">
+                    <i className="fa-solid fa-id-card me-2"></i>Professional Information
+                  </h5>
+                  <div className="row mt-3">
+                    <div className="col-md-6">
+                      <p><strong><i className="fa-solid fa-music text-secondary me-2"></i>Genre:</strong> {profile.profile.genre}</p>
+                      <p><strong><i className="fa-solid fa-drum text-secondary me-2"></i>Instrument:</strong> {profile.profile.instrument}</p>
+                    </div>
+                    <div className="col-md-6">
+                      <p><strong><i className="fa-solid fa-location-dot text-secondary me-2"></i>Location:</strong> {profile.profile.location}</p>
+                      <p><strong><i className="fa-solid fa-calendar text-secondary me-2"></i>Founded year:</strong> {profile.profile.founded_year}</p>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <strong>Bio:</strong>
+                    <p className="text-muted small">{profile.profile.bio}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="alert alert-light border-dashed mt-3 text-center">
+                <p className="mb-2 text-muted">Your profile has not been created.</p>
+
+              </div>
+            )}
+          </div>
+
+          <div className="d-flex gap-2 mt-4">
+
+            <div className="d-flex gap-2 mt-4">
+
+              {!profile.profile && (
+                <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                  <i className="fa-solid fa-user-gear me-2"></i> Complete Profile
+                </button>
+              )}
+            </div>
+
+
+          </div>
+          <div className="modal fade" id="editProfileModal" tabIndex="-1">
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Details of the Professional Profile</h5>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div className="modal-body">
+                  <ProfileForm userId={user_id} onProfileCreated={handleProfileUpdate} />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="d-flex gap-4 mt-3">
             <div className="text-center">15 <small>Followers</small></div>
             <div className="text-center">20 <small>Following</small></div>
           </div>
-          
+
           <div className="mt-4">
             <button
               className="btn btn-primary"
@@ -105,7 +190,7 @@ export const Profile = () => {
         </div>
       </div>
 
-     
+
       <div className="modal fade" id="postCreationModal" tabIndex="-1">
         <div className="modal-dialog modal-lg">
           <div className="modal-content">
@@ -114,7 +199,7 @@ export const Profile = () => {
               <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div className="modal-body">
-             
+
               <PostCreation userId={user_id} onPostCreated={loadUserPosts} />
             </div>
           </div>
@@ -123,7 +208,7 @@ export const Profile = () => {
 
       <hr className="my-5" />
 
-      <h3 className="mb-4 text-center">Mis Publicaciones</h3>
+      <h3 className="mb-4 text-center">My Posts</h3>
       <div className="row justify-content-center">
         {userPosts.length > 0 ? (
           userPosts.map((post) => (
@@ -136,11 +221,12 @@ export const Profile = () => {
               userEmail={post.author_email}
               onDelete={loadUserPosts}
               showDelete={true}
+              authorId={post.author_id}
             />
           ))
         ) : (
           <div className="col-12 text-center">
-            <p className="text-muted italic">Este usuario aún no tiene publicaciones.</p>
+            <p className="text-muted italic">This user has no posts</p>
           </div>
         )}
       </div>

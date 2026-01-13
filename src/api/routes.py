@@ -27,8 +27,6 @@ def handle_hello():
     return jsonify(response_body), 200
 
 
-
-
 @api.route('/users', methods=['POST'])
 def sign_up():
     data = request.get_json()
@@ -50,9 +48,7 @@ def sign_up():
             password_hash=hashed_password,
             role=data['role']
         )
-    
 
-        
         db.session.add(new_user)
         db.session.commit()
 
@@ -61,7 +57,7 @@ def sign_up():
             "user": new_user.serialize
         }), 201
     except Exception as e:
-        db.session.rollback()   
+        db.session.rollback()
         print(f"Error al crear usuario: {e}")
         return jsonify({
             "message": "Internal Server Error",
@@ -102,7 +98,8 @@ def update_user(user_id):
             user.email = data.get('email', user.email)
             user.password_hash = data.get('password', user.password_hash)
             user.role = data.get('role', user.role)
-            user.profile_image_url = data.get('profile_image_url',user.profile_image_url)
+            user.profile_image_url = data.get(
+                'profile_image_url', user.profile_image_url)
             db.session.commit()
             return jsonify(user.serialize), 200
         return jsonify({"message": "Usuario no encontrado"}), 400
@@ -129,6 +126,31 @@ def delete_user(user_id):
                         }), 500
 
 
+# @api.route('/user_profiles', methods=['POST'])
+# def create_profile():
+#     try:
+#         data = request.get_json()
+#         new_profile = UserProfile(
+#             user_id=data['user_id'],
+#             display_name=data['display_name'],
+#             updated_at=datetime.now(),
+#             bio=data['bio'],
+#             genre=data['genre'],
+#             instrument=data['instrument'],
+#             founded_year=data['founded_year'],
+#             enterprise_type=data['enterprise_type'],
+#             location=data['location'],
+#             profile_image_url=data['profile_image_url'],
+#             website_url=data['website_url']
+#         )
+#         db.session.add(new_profile)
+#         db.session.commit()
+#         return jsonify(new_profile.serialize), 201
+
+#     except Exception as e:
+#         return jsonify({"msg": "Internal Server Error",
+#                         "error": str(e)
+#                         }), 500
 @api.route('/user_profiles', methods=['POST'])
 def create_profile():
     try:
@@ -148,12 +170,25 @@ def create_profile():
         )
         db.session.add(new_profile)
         db.session.commit()
+        user = User.query.get(data['user_id'])
+        db.session.refresh(user)
         return jsonify(new_profile.serialize), 201
 
     except Exception as e:
-        return jsonify({"msg": "Internal Server Error",
-                        "error": str(e)
-                        }), 500
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route('/user_profiles/user/<int:user_id>', methods=['GET'])
+def get_profile_by_user(user_id):
+    try:
+
+        profile = UserProfile.query.filter_by(user_id=user_id).first()
+        if profile:
+            return jsonify(profile.serialize), 200
+        return jsonify({"message": "Perfil no encontrado"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @api.route('/user_profiles', methods=['GET'])
@@ -294,15 +329,15 @@ def get_post(post_id):
 @api.route('/feed_posts/<int:post_id>', methods=['PUT'])
 def update_post(post_id):
     try:
-        data = request.get_json() 
-        post = db.session.get(FeedPost, post_id) 
-        
+        data = request.get_json()
+        post = db.session.get(FeedPost, post_id)
+
         if post:
-            
+
             post.content_text = data.get('content_text', post.content_text)
             db.session.commit()
             return jsonify({"post": post.serialize, "message": "Post actualizado"}), 200
-            
+
         return jsonify({"message": "Post no encontrado"}), 404
     except Exception as e:
         db.session.rollback()
@@ -534,7 +569,7 @@ def unfollow_user(user_id):
 # @api.route("/login", methods=["POST"])
 # def login():
 #     data = request.get_json()
-#     user = User.query.filter_by(email=data["email"].lower()).first()  
+#     user = User.query.filter_by(email=data["email"].lower()).first()
 
 #     if not user or not check_password_hash(user.password_hash, data["password_hash"]):
 #       return  jsonify({"msg": " Email o Contraseña Invalidas"}), 401
@@ -582,10 +617,11 @@ def upload_image():
     result = cloudinary.uploader.upload(file)
     return result["secure_url"]
 
+
 @api.route('/users/<int:user_id>/posts', methods=['GET'])
 def get_user_posts(user_id):
     try:
-        
+
         posts = FeedPost.query.filter_by(user_id=user_id).all()
         return jsonify([post.serialize for post in posts]), 200
     except Exception as e:

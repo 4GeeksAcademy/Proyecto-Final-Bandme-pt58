@@ -13,8 +13,8 @@ export const EditPostModal = ({ post, onPostUpdated }) => {
             });
 
             if (response.ok) {
-                onPostUpdated(); // Refresca la lista en Profile
-                // Cerrar modal manualmente si es necesario
+                onPostUpdated();
+                
                 const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal-${post.post_id}`));
                 modal.hide();
             }
@@ -40,7 +40,7 @@ export const EditPostModal = ({ post, onPostUpdated }) => {
                         />
                     </div>
                     <div className="modal-footer">
-                        <button className="btn btn-primary" onClick={handleUpdate}>Guardar Cambios</button>
+                        <button className="btn btn-primary" onClick={handleUpdate}>Save</button>
                     </div>
                 </div>
             </div>
