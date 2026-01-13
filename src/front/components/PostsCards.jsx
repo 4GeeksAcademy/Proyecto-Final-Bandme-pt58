@@ -2,7 +2,7 @@ import { EditPostModal } from "./EditPostModal";
 
 export default function PostsCard({ post_id, image, text, userEmail, userName, onDelete, showDelete }) {
     const handleDelete = async () => {
-        if (window.confirm("¿Estás seguro de que quieres borrar este post?")) {
+        if (window.confirm("Are you sure you want to delete this post")) {
             try {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL;
                 const response = await fetch(`${backendUrl}/api/feed_posts/${post_id}`, {
@@ -26,7 +26,7 @@ export default function PostsCard({ post_id, image, text, userEmail, userName, o
 
                 {showDelete && (
                     <div className="position-absolute" style={{ top: "5px", right: "5px", zIndex: 10 }}>
-                        
+
                         <button
                             className="btn btn-sm btn-secondary me-1"
                             data-bs-toggle="modal"

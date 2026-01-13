@@ -28,16 +28,16 @@ export const Profile = () => {
     try {
       const response = await fetch(`${backendUrl}/api/users/${user_id}`, {
         method: "PUT",
-        body: JSON.stringify({profile_image_url: url}),
-        headers: {"Content-Type" : "application/json"}
+        body: JSON.stringify({ profile_image_url: url }),
+        headers: { "Content-Type": "application/json" }
       })
-      if (response.ok){
+      if (response.ok) {
         const data = await response.json();
         setProfile(data)
       }
     } catch (error) {
       console.error("Error al cargar imagen:", err);
-      
+
     }
   }
 
@@ -55,8 +55,8 @@ export const Profile = () => {
     loadUserPosts();
   }, [user_id]);
 
-  useEffect(() =>{
-    if(imgUrl){
+  useEffect(() => {
+    if (imgUrl) {
       handleUpdate(imgUrl)
     }
   }, [imgUrl])
@@ -92,7 +92,7 @@ export const Profile = () => {
             <div className="text-center">15 <small>Followers</small></div>
             <div className="text-center">20 <small>Following</small></div>
           </div>
-          
+
           <div className="mt-4">
             <button
               className="btn btn-primary"
@@ -105,7 +105,7 @@ export const Profile = () => {
         </div>
       </div>
 
-     
+
       <div className="modal fade" id="postCreationModal" tabIndex="-1">
         <div className="modal-dialog modal-lg">
           <div className="modal-content">
@@ -114,7 +114,7 @@ export const Profile = () => {
               <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div className="modal-body">
-             
+
               <PostCreation userId={user_id} onPostCreated={loadUserPosts} />
             </div>
           </div>
@@ -123,7 +123,7 @@ export const Profile = () => {
 
       <hr className="my-5" />
 
-      <h3 className="mb-4 text-center">Mis Publicaciones</h3>
+      <h3 className="mb-4 text-center">My Posts</h3>
       <div className="row justify-content-center">
         {userPosts.length > 0 ? (
           userPosts.map((post) => (
@@ -140,7 +140,7 @@ export const Profile = () => {
           ))
         ) : (
           <div className="col-12 text-center">
-            <p className="text-muted italic">Este usuario aún no tiene publicaciones.</p>
+            <p className="text-muted italic">You don't have any Posts.</p>
           </div>
         )}
       </div>

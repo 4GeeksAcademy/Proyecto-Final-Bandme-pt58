@@ -40,7 +40,7 @@ export const EditPostModal = ({ post, onPostUpdated }) => {
                         />
                     </div>
                     <div className="modal-footer">
-                        <button className="btn btn-primary" onClick={handleUpdate}>Guardar Cambios</button>
+                        <button className="btn btn-primary" onClick={handleUpdate}>Save changes</button>
                     </div>
                 </div>
             </div>
