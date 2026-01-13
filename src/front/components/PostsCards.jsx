@@ -12,7 +12,7 @@ export default function PostsCard({ image, text, userEmail, userName }) {
                 )}
 
                 <div className="card-body d-flex flex-column">
-                    <h5 className="card-title text-primary">@{userName}</h5>
+                    <h5 className="card-title text-primary">Posted by: {userName}</h5>
                     <p className="card-text flex-grow-1">{text}</p>
 
 
