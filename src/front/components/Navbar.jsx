@@ -36,13 +36,7 @@ export const Navbar = () => {
               <Link className="nav-link" to="/">HOME</Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">COMMUNITY</a>
-            </li>
-            <li className="nav-item">
               <Link className="nav-link" to="/aboutus">ABOUT US</Link>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">LIBRARY</a>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/pricing">PRICING</Link>
@@ -67,7 +61,7 @@ export const Navbar = () => {
                   <Link className="btn btn-outline-light me-2" to="/login">Login</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="btn btn-primary" to="/signup">Sign up</Link>
+                  <Link className="btn btn-outline-light" to="/signup">Sign up</Link>
                 </li>
               </>
             ) : !store.currentUser ? (

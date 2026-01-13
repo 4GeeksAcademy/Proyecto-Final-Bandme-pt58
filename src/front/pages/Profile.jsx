@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { json, useParams } from "react-router-dom";
 import { UploadImg } from "../components/UploadImg";
 import PostCreation from "../components/PostCreation";
 import PostsCard from "../components/PostsCards.jsx";
@@ -24,18 +24,42 @@ export const Profile = () => {
     }
   };
 
+  const handleUpdate = async (url) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/users/${user_id}`, {
+        method: "PUT",
+        body: JSON.stringify({profile_image_url: url}),
+        headers: {"Content-Type" : "application/json"}
+      })
+      if (response.ok){
+        const data = await response.json();
+        setProfile(data)
+      }
+    } catch (error) {
+      console.error("Error al cargar imagen:", err);
+      
+    }
+  }
+
   useEffect(() => {
     if (!user_id) return;
 
     const fetchProfile = async () => {
       const res = await fetch(`${backendUrl}/api/users/${user_id}`);
       const data = await res.json();
+      console.log(data)
       setProfile(data);
     };
 
     fetchProfile();
     loadUserPosts();
   }, [user_id]);
+
+  useEffect(() =>{
+    if(imgUrl){
+      handleUpdate(imgUrl)
+    }
+  }, [imgUrl])
 
   if (!profile) return <div className="text-center mt-5">Loading...</div>;
 
@@ -46,8 +70,8 @@ export const Profile = () => {
           <img
             src={profile?.profile_image_url || "https://cdn-icons-png.flaticon.com/512/9187/9187604.png"}
             className="mb-3 rounded-circle"
-            width="200px"
-            height="200px"
+            width="300px"
+            height="300px"
             style={{ objectFit: "cover" }}
           />
           <div>
@@ -58,9 +82,10 @@ export const Profile = () => {
 
         <div className="col-md-8">
           <div className="card-body">
-            <h4 className="text-muted">Username: {profile.username}</h4>
+            <h4 className="text-muted text-uppercase">{profile.username}</h4>
             <h4 className="text-muted"><i className="fa-solid fa-envelope"></i> {profile.email}</h4>
-            <h4 className="text-muted">Role: {profile.role}</h4>
+            <h4 className="text-muted">{profile.role}</h4>
+
           </div>
 
           <div className="d-flex gap-4 mt-3">
