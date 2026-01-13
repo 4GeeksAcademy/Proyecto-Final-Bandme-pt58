@@ -60,6 +60,7 @@ export const Home = () => {
 								text={post.content_text}
 								userName={post.author_username}
 								userEmail={post.author_email}
+								authorId={post.author_id}
 							/>
 						))
 					) : (

@@ -120,6 +120,7 @@ class FeedPost(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "likes_count": self.likes_count,
+            "author_id": self.user_id,
             "media_files": [m.serialize for m in self.media_files],
             "author_username": self.author.username if self.author else "Musician", "author_email": self.author.email if self.author else "no-email@bandme.com"
 

@@ -40,16 +40,16 @@ export const Profile = () => {
         const infoData = await resInfo.json();
 
 
-        setProfile({ 
-        ...userData, 
-        profile: infoData 
-      });
-    } else {
-      
-      setProfile({ 
-        ...userData, 
-        profile: null 
-      });
+        setProfile({
+          ...userData,
+          profile: infoData
+        });
+      } else {
+
+        setProfile({
+          ...userData,
+          profile: null
+        });
       }
     } catch (error) {
       console.error("Error by uploading the data:", error);
@@ -141,21 +141,21 @@ export const Profile = () => {
             ) : (
               <div className="alert alert-light border-dashed mt-3 text-center">
                 <p className="mb-2 text-muted">Your profile has not been created.</p>
-                
+
               </div>
             )}
           </div>
 
           <div className="d-flex gap-2 mt-4">
-            
+
             <div className="d-flex gap-2 mt-4">
-    
-    {!profile.profile && (
-        <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-            <i className="fa-solid fa-user-gear me-2"></i> Complete Profile
-        </button>
-    )}
-</div>
+
+              {!profile.profile && (
+                <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                  <i className="fa-solid fa-user-gear me-2"></i> Complete Profile
+                </button>
+              )}
+            </div>
 
 
           </div>
@@ -221,6 +221,7 @@ export const Profile = () => {
               userEmail={post.author_email}
               onDelete={loadUserPosts}
               showDelete={true}
+              authorId={post.author_id}
             />
           ))
         ) : (
