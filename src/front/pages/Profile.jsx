@@ -104,10 +104,13 @@ export const Profile = () => {
           userPosts.map((post) => (
             <PostsCard
               key={post.post_id}
+              post_id={post.post_id}
               image={post.image_url}
               text={post.content_text}
               userName={post.author_username}
               userEmail={post.author_email}
+              onDelete={loadUserPosts}
+              showDelete={true}
             />
           ))
         ) : (

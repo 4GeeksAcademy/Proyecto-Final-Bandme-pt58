@@ -1,7 +1,52 @@
-export default function PostsCard({ image, text, userEmail, userName }) {
+import { EditPostModal } from "./EditPostModal";
+
+export default function PostsCard({ post_id, image, text, userEmail, userName, onDelete, showDelete }) {
+    const handleDelete = async () => {
+        if (window.confirm("¿Estás seguro de que quieres borrar este post?")) {
+            try {
+                const backendUrl = import.meta.env.VITE_BACKEND_URL;
+                const response = await fetch(`${backendUrl}/api/feed_posts/${post_id}`, {
+                    method: "DELETE",
+                });
+
+                if (response.ok) {
+                    onDelete();
+                }
+            } catch (error) {
+                console.error("Error deleting post:", error);
+            }
+        }
+    };
+
+
+
     return (
         <div className="col-md-4 mb-4 d-flex justify-content-center">
             <div className="card border border-secondary shadow h-100" style={{ width: "18rem" }}>
+
+                {showDelete && (
+                    <div className="position-absolute" style={{ top: "5px", right: "5px", zIndex: 10 }}>
+                        
+                        <button
+                            className="btn btn-sm btn-secondary me-1"
+                            data-bs-toggle="modal"
+                            data-bs-target={`#editModal-${post_id}`}
+                        >
+                            <i className="fa-solid fa-pen"></i>
+                        </button>
+
+                        <button onClick={handleDelete} className="btn btn-sm btn-danger">
+                            <i className="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                )}
+
+                {showDelete && (
+                    <EditPostModal
+                        post={{ post_id, text }}
+                        onPostUpdated={onDelete}
+                    />
+                )}
                 {image && (
                     <img
                         src={image}

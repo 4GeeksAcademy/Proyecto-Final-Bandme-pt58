@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UploadImg } from "./UploadImg";
 
-export default function PostCreation({ userId, onPostCreated }) {
+export default function PostCreation({ userId, onPostCreated,  }) {   //postId
     const [text, setText] = useState("");
     const [imgUrl, setImgUrl] = useState("");
     const [publishHome, setPublishHome] = useState(false)
