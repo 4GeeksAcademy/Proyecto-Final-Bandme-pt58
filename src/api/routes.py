@@ -9,7 +9,7 @@ from datetime import datetime
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 import cloudinary.uploader
-
+   
 
 api = Blueprint('api', __name__)
 
@@ -25,8 +25,6 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
-
-
 
 
 @api.route('/users', methods=['POST'])
@@ -50,18 +48,20 @@ def sign_up():
             password_hash=hashed_password,
             role=data['role']
         )
-    
 
-        
         db.session.add(new_user)
+
         db.session.commit()
 
         return jsonify({
             "message": "Usuario creado con éxito",
-            "user": new_user.serialize
+            "user": new_user.serialize,
+            # "profile_id": profile.profile_id
         }), 201
     except Exception as e:
-        db.session.rollback()   
+        db.session.rollback()
+        import traceback
+        traceback.print_exc()
         print(f"Error al crear usuario: {e}")
         return jsonify({
             "message": "Internal Server Error",
@@ -511,7 +511,7 @@ def unfollow_user(user_id):
 # @api.route("/login", methods=["POST"])
 # def login():
 #     data = request.get_json()
-#     user = User.query.filter_by(email=data["email"].lower()).first()  
+#     user = User.query.filter_by(email=data["email"].lower()).first()
 
 #     if not user or not check_password_hash(user.password_hash, data["password_hash"]):
 #       return  jsonify({"msg": " Email o Contraseña Invalidas"}), 401
@@ -562,3 +562,51 @@ def upload_image():
 
 if __name__ == '__main__':
     api.run(debug=True)
+
+ 
+
+@api.route('/feed_posts/<int:post_id>/likes', methods=['POST'])
+@jwt_required()
+def toggle_like(post_id):
+    user_id = get_jwt_identity()
+
+    try:
+        post = FeedPost.query.get(post_id)
+        if not post:
+            return jsonify({"message": "Post no encontrado"}), 404
+
+        like = Like.query.filter_by(
+            user_id=user_id,
+            post_id=post_id
+        ).first()
+
+        # 💔 UNLIKE
+        if like:
+            db.session.delete(like)
+            post.likes_count = max((post.likes_count or 1) - 1, 0)
+            db.session.commit()
+
+            return jsonify({
+                "liked": False,
+                "likes_count": post.likes_count
+            }), 200
+
+        # ❤️ LIKE
+        new_like = Like(
+            user_id=user_id,
+            post_id=post_id
+        )
+
+        post.likes_count = (post.likes_count or 0) + 1
+
+        db.session.add(new_like)
+        db.session.commit()
+
+        return jsonify({
+            "liked": True,
+            "likes_count": post.likes_count
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
