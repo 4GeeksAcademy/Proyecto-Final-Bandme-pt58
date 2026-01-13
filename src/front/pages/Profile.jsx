@@ -57,7 +57,7 @@ export const Profile = () => {
   };
 
   const handleProfileUpdate = () => {
-    console.log("Actualizando vista de perfil...");
+    console.log("Updating the profile view...");
     fetchProfile();
   };
 

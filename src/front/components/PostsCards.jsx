@@ -57,7 +57,7 @@ export default function PostsCard({ post_id, image, text, userEmail, userName, o
                 )}
 
                 <div className="card-body d-flex flex-column">
-                    <h5 className="card-title text-primary">Posted by: {userName}</h5>
+                    <h5 className="card-title text-primary posted-by-style">Posted by: {userName}</h5>
                     <p className="card-text flex-grow-1">{text}</p>
 
 
