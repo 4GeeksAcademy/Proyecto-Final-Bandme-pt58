@@ -221,30 +221,30 @@ def get_profile(profile_id):
 
 @api.route('/user_profiles/<int:profile_id>', methods=['PUT'])
 def update_profile(profile_id):
-    try:
-        data = request.get_json()
-        profile = UserProfile.query.get(profile_id)
-        if profile:
-            profile.display_name = data.get(
-                'display_name', profile.display_name)
-            profile.bio = data.get('bio', profile.bio)
-            profile.genre = data.get('genre', profile.genre)
-            profile.instrument = data.get('instrument', profile.instrument)
-            profile.founded_year = data.get(
-                'founded_year', profile.founded_year)
-            profile.enterprise_type = data.get(
-                'enterprise_type', profile.enterprise_type)
-            profile.location = data.get('location', profile.location)
-            profile.profile_image_url = data.get(
-                'profile_image_url', profile.profile_image_url)
-            profile.website_url = data.get('website_url', profile.website_url)
-            db.session.commit()
-            return jsonify(profile.serialize), 200
-        return jsonify({"message": "Perfil no encontrado"}), 404
-    except Exception as e:
-        return jsonify({"msg": "Internal Server Error",
-                        "error": str(e)
-                        }), 500
+    # try:
+    data = request.get_json()
+    profile = UserProfile.query.get(profile_id)
+    if profile:
+        profile.display_name = data.get(
+            'display_name', profile.display_name)
+        profile.bio = data.get('bio', profile.bio)
+        profile.genre = data.get('genre', profile.genre)
+        profile.instrument = data.get('instrument', profile.instrument)
+        profile.founded_year = data.get(
+            'founded_year', profile.founded_year)
+        profile.enterprise_type = data.get(
+            'enterprise_type', profile.enterprise_type)
+        profile.location = data.get('location', profile.location)
+        profile.profile_image_url = data.get(
+            'profile_image_url', profile.profile_image_url)
+        profile.website_url = data.get('website_url', profile.website_url)
+        db.session.commit()
+        return jsonify(profile.serialize), 200
+    return jsonify({"message": "Perfil no encontrado"}), 404
+    # except Exception as e:
+    #     return jsonify({"msg": "Internal Server Error",
+    #                     "error": str(e)
+    #                     }), 500
 
 
 @api.route('/user_profiles/<int:profile_id>', methods=['DELETE'])

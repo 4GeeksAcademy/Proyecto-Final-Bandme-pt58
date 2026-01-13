@@ -148,13 +148,23 @@ export const Profile = () => {
 
           <div className="d-flex gap-2 mt-4">
 
-            <div className="d-flex gap-2 mt-4">
+            {/* <div className="d-flex gap-2 mt-4">
 
               {!profile.profile && (
                 <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                   <i className="fa-solid fa-user-gear me-2"></i> Complete Profile
                 </button>
               )}
+            </div> */}
+            <div className="d-flex gap-2 mt-4">
+              <button
+                className={`btn ${profile.profile ? "btn-outline-primary" : "btn-outline-secondary"}`}
+                data-bs-toggle="modal"
+                data-bs-target="#editProfileModal"
+              >
+                <i className={`fa-solid ${profile.profile ? "fa-user-pen" : "fa-user-gear"} me-2`}></i>
+                {profile.profile ? "Editar Perfil Profesional" : "Completar Perfil"}
+              </button>
             </div>
 
 
@@ -167,7 +177,7 @@ export const Profile = () => {
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div className="modal-body">
-                  <ProfileForm userId={user_id} onProfileCreated={handleProfileUpdate} />
+                  <ProfileForm userId={user_id} onProfileCreated={handleProfileUpdate} initialData={profile.profile}/>
                 </div>
               </div>
             </div>
