@@ -31,7 +31,7 @@ export default function PostCreation({ userId, onPostCreated,  }) {
                     onPostCreated(); 
                 }
                 
-                console.log("¡Post creado y lista actualizada!");
+                console.log("The post was created and the list was updated");
             }
         } catch (error) {
             console.error("Error saving post:", error);
