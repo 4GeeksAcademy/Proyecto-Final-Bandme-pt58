@@ -9,7 +9,7 @@ from datetime import datetime
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 import cloudinary.uploader
-
+   
 
 api = Blueprint('api', __name__)
 
@@ -50,11 +50,13 @@ def sign_up():
         )
 
         db.session.add(new_user)
+
         db.session.commit()
 
         return jsonify({
             "message": "Usuario creado con éxito",
-            "user": new_user.serialize
+            "user": new_user.serialize,
+            # "profile_id": profile.profile_id
         }), 201
     except Exception as e:
         db.session.rollback()
@@ -630,3 +632,51 @@ def get_user_posts(user_id):
 
 if __name__ == '__main__':
     api.run(debug=True)
+
+ 
+
+@api.route('/feed_posts/<int:post_id>/likes', methods=['POST'])
+@jwt_required()
+def toggle_like(post_id):
+    user_id = get_jwt_identity()
+
+    try:
+        post = FeedPost.query.get(post_id)
+        if not post:
+            return jsonify({"message": "Post no encontrado"}), 404
+
+        like = Like.query.filter_by(
+            user_id=user_id,
+            post_id=post_id
+        ).first()
+
+        # 💔 UNLIKE
+        if like:
+            db.session.delete(like)
+            post.likes_count = max((post.likes_count or 1) - 1, 0)
+            db.session.commit()
+
+            return jsonify({
+                "liked": False,
+                "likes_count": post.likes_count
+            }), 200
+
+        # ❤️ LIKE
+        new_like = Like(
+            user_id=user_id,
+            post_id=post_id
+        )
+
+        post.likes_count = (post.likes_count or 0) + 1
+
+        db.session.add(new_like)
+        db.session.commit()
+
+        return jsonify({
+            "liked": True,
+            "likes_count": post.likes_count
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
