@@ -3,6 +3,7 @@ from sqlalchemy import String, Boolean, Enum, Integer, Text, DateTime, ForeignKe
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from datetime import datetime
+ 
 
 db = SQLAlchemy()
 
@@ -24,6 +25,7 @@ class User(db.Model):
     posts = relationship("FeedPost", back_populates="author")
     likes = relationship("Like", back_populates="user")
     favorites = relationship("FavoriteElement", back_populates="user")
+    
 
     @property
     def serialize(self):
@@ -57,6 +59,7 @@ class UserProfile(db.Model):
     updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
 
     user = relationship("User", back_populates="profile")
+   
     
     @property
     def serialize(self):
@@ -83,7 +86,8 @@ class FeedPost(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False)
     publish_home: Mapped[bool] = mapped_column(Boolean, default=False)   
     content_text: Mapped[str] = mapped_column(Text)
-    image_url: Mapped[str] = mapped_column(String(255), nullable=True) 
+    image_url = db.Column(db.String(255))
+    publish_home = db.Column(db.Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=func.now())
     likes_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -213,3 +217,4 @@ class FavoriteElement(db.Model):
             "element_id": self.element_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+    

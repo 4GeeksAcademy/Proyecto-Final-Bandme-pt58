@@ -1,15 +1,10 @@
 import { useState } from "react"
-
 export const UploadImg = ({ imgUrl, setImgUrl }) => {
     const [file, setFile] = useState(null)
-
-
     async function handleSubmit() {
         if (!file) return
-
         const formData = new FormData()
         formData.append("image", file)
-
         try {
             console.log(file)
             const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -17,18 +12,14 @@ export const UploadImg = ({ imgUrl, setImgUrl }) => {
                 method: "POST",
                 body: formData
             });
-
             if (!response.ok) {
             throw new Error("Error al subir imagen")
             }
-
             const data = await response.text()
             setImgUrl(data)
-
         } catch (error) {
             console.log("error al cargar imagen", error)
         }
-
     }
     return (
         <>
@@ -37,5 +28,4 @@ export const UploadImg = ({ imgUrl, setImgUrl }) => {
             <input type="button" value="Enviar" onClick={handleSubmit} />
         </>
     )
-
-} 
+}
