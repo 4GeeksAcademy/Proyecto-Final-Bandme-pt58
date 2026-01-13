@@ -2,210 +2,197 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UploadImg } from "../components/UploadImg";
 import PostCreation from "../components/PostCreation";
+import PostsCard from "../components/PostsCards.jsx";
+import { ProfileForm } from "../components/ProfileForm.jsx"
+
 
 export const Profile = () => {
-  const { profile_id } = useParams();
+  const { user_id } = useParams();
   const [profile, setProfile] = useState(null);
-  const [imgUrl, setImgUrl] = useState(null)
+  const [imgUrl, setImgUrl] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  useEffect(() => {
-    if (!profile_id) return;
-
-    const fetchProfile = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/user_profiles/${profile_id}`);
-        const data = await response.json();
-        setProfile(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchProfile();
-  }, [profile_id, backendUrl]);
-
-  if (!profile) {
-    return <h2 className="text-center mt-5">Loading profile...</h2>;
-  }
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("user_id", profile_id);
-
+  const loadUserPosts = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/upload-profile-image`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-
-      setProfile(prev => ({ ...prev, profile_image_url: data.profile_image_url }));
+      const resPosts = await fetch(`${backendUrl}/api/users/${user_id}/posts`);
+      if (resPosts.ok) {
+        const dataPosts = await resPosts.json();
+        setUserPosts(dataPosts);
+      }
     } catch (err) {
-      console.error("Error uploading image:", err);
+      console.error("Error al recargar posts:", err);
     }
   };
+
+
+  const fetchProfile = async () => {
+    try {
+
+      const resUser = await fetch(`${backendUrl}/api/users/${user_id}`);
+      const userData = await resUser.json();
+
+
+      const resInfo = await fetch(`${backendUrl}/api/user_profiles/user/${user_id}`);
+
+      if (resInfo.ok) {
+        const infoData = await resInfo.json();
+
+
+        setProfile({
+          ...userData,
+          profile: infoData
+        });
+      } else {
+
+        setProfile({
+          ...userData,
+          profile: null
+        });
+      }
+    } catch (error) {
+      console.error("Error by uploading the data:", error);
+    }
+  };
+
+  const handleProfileUpdate = () => {
+    console.log("Updating the profile view...");
+    fetchProfile();
+  };
+
+
+  const handleUpdate = async (url) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/users/${user_id}`, {
+        method: "PUT",
+        body: JSON.stringify({ profile_image_url: url }),
+        headers: { "Content-Type": "application/json" }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error("Error al cargar imagen:", error);
+    }
+  };
+  useEffect(() => {
+    if (user_id) {
+      fetchProfile();
+      loadUserPosts();
+    }
+  }, [user_id]);
+
+  useEffect(() => {
+    if (imgUrl) {
+      handleUpdate(imgUrl);
+    }
+  }, [imgUrl]);
+
+
+  if (!profile) return <div className="text-center mt-5">Loading...</div>;
+
   return (
-
     <div className="container">
-
-      <div className="row">
+      <div className="row mt-5">
         <div className="col-md-4 text-start">
-          <UploadImg imgUrl={imgUrl} setImgUrl={setImgUrl} />
           <img
-            src={profile.profile_image_url}
+            src={profile?.profile_image_url || "https://cdn-icons-png.flaticon.com/512/9187/9187604.png"}
             className="mb-3 rounded-circle"
             width="300px"
             height="300px"
+            style={{ objectFit: "cover" }}
           />
-
-          <div className="d-flex-justify-content-center mt-2  gap-2">
-            <button className="btn btn-secondary me-2">Follow</button>
-            <button className="btn btn-secondary">  Message</button>
+          <div>
+            <small><i className="fa-solid fa-pen"></i> Edit your profile image</small>
+            <UploadImg imgUrl={imgUrl} setImgUrl={setImgUrl} />
           </div>
         </div>
 
         <div className="col-md-8">
           <div className="card-body">
-            <h1 className="card-title">{profile.display_name}</h1>
-            <h4 className="text muted">{profile.username}</h4>
-            <p className="card-text">{profile.bio}</p>
+            <h4 className="text-muted text-uppercase">{profile.username}</h4>
+            <h4 className="text-muted"><i className="fa-solid fa-envelope"></i> {profile.email}</h4>
+            <h4 className="text-muted">{profile.role}</h4>
+
+            {profile.profile ? (
+              <div className="card shadow-sm border-0 mt-3" style={{ background: "#f8f9fa" }}>
+                <div className="card-body">
+                  <h5 className="border-bottom pb-2 text-primary">
+                    <i className="fa-solid fa-id-card me-2"></i>Professional Information
+                  </h5>
+                  <div className="row mt-3">
+                    <div className="col-md-6">
+                      <p><strong><i className="fa-solid fa-music text-secondary me-2"></i>Genre:</strong> {profile.profile.genre}</p>
+                      <p><strong><i className="fa-solid fa-drum text-secondary me-2"></i>Instrument:</strong> {profile.profile.instrument}</p>
+                    </div>
+                    <div className="col-md-6">
+                      <p><strong><i className="fa-solid fa-location-dot text-secondary me-2"></i>Location:</strong> {profile.profile.location}</p>
+                      <p><strong><i className="fa-solid fa-calendar text-secondary me-2"></i>Founded year:</strong> {profile.profile.founded_year}</p>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <strong>Bio:</strong>
+                    <p className="text-muted small">{profile.profile.bio}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="alert alert-light border-dashed mt-3 text-center">
+                <p className="mb-2 text-muted">Your profile has not been created.</p>
+
+              </div>
+            )}
           </div>
 
-          <div className="d-flex gap-4 me-auto">
-            <div className="text-center">
-              <h5>{profile.tracks_count}</h5>
-              <small>Tracks</small>
+          <div className="d-flex gap-2 mt-4">
+
+            <div className="d-flex gap-2 mt-4">
+
+              {!profile.profile && (
+                <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                  <i className="fa-solid fa-user-gear me-2"></i> Complete Profile
+                </button>
+              )}
             </div>
-            <div className="text-center">
-              <h5>{profile.followers_count}</h5>
-              <small>Followers</small>
-            </div>
-            <div className="text-center">
-              <h5>{profile.following_count}</h5>
-              <small>Following</small>
+
+
+          </div>
+          <div className="modal fade" id="editProfileModal" tabIndex="-1">
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Details of the Professional Profile</h5>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div className="modal-body">
+                  <ProfileForm userId={user_id} onProfileCreated={handleProfileUpdate} />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <ul className="nav nav-tabs d-flex justify-content-center mt-4">
-        <li className="nav-item">
-          <button className="nav-link active" data-bs-toggle="tab" data-bs-target="#music">
-            <i className="fa-solid fa-music fa-2x"></i>
-          </button>
-        </li>
-        <li className="nav-item">
-          <button className="nav-link" data-bs-toggle="tab" data-bs-target="#photos">
-            <i className="fa-solid fa-camera fa-2x"></i>
-          </button>
-        </li>
-        <li className="nav-item">
-          <button className="nav-link" data-bs-toggle="tab" data-bs-target="#videos">
-            <i className="fa-solid fa-video fa-2x"></i>
-          </button>
-        </li>
-      </ul>
+          <div className="d-flex gap-4 mt-3">
+            <div className="text-center">15 <small>Followers</small></div>
+            <div className="text-center">20 <small>Following</small></div>
+          </div>
 
-
-      <div className="tab-content mt-4">
-
-
-        <div className="tab-pane fade show active text-center" id="music">
-          <img
-            src="https://i.pinimg.com/1200x/d6/c2/5a/d6c25a342c1ca5558f269001e0126667.jpg"
-            width="500"
-            height="700"
-            alt="music"
-          />
-        </div>
-
-
-        <div className="tab-pane fade" id="photos">
-          <div className="row mt-3">
-            <div className="col">
-              <img className="w-100" src="https://i.pinimg.com/1200x/6f/3c/7a/6f3c7ab1042a04409d8550403a3636c3.jpg" />
-            </div>
-            <div className="col">
-              <img className="w-100" src="https://i.pinimg.com/1200x/8e/c5/cd/8ec5cdd3701d4e7259c421585c8483dd.jpg" />
-            </div>
-            <div className="col">
-              <img className="w-100" src="https://i.pinimg.com/1200x/7a/3c/2d/7a3c2d28678938db3f8c4696cdf2f305.jpg" />
-            </div>
+          <div className="mt-4">
+            <button
+              className="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#postCreationModal"
+            >
+              <i className="fa-solid fa-plus me-2"></i> Create Post
+            </button>
           </div>
         </div>
-
-
-        <div className="tab-pane fade" id="videos">
-          <div className="row mt-3">
-            <div className="col">
-              <iframe
-                width="100%"
-                height="250"
-                src="https://www.youtube.com/embed/3ssL8vx7Xhg"
-                allowFullScreen
-              ></iframe>
-            </div>
-            <div className="col">
-              <iframe
-                width="100%"
-                height="250"
-                src="https://www.youtube.com/embed/3ssL8vx7Xhg"
-                allowFullScreen
-              ></iframe>
-            </div>
-            <div className="col">
-              <iframe
-                width="100%"
-                height="250"
-                src="https://www.youtube.com/embed/3ssL8vx7Xhg"
-                allowFullScreen
-              ></iframe>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-
-      <div className="modal fade" id="messageModal" tabIndex="-1">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Message</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div className="modal-body">
-              <textarea className="form-control" placeholder="Write a message..."></textarea>
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button className="btn btn-primary">Send</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-3">
-        <button
-          className="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#postCreationModal"
-        >
-          Create Post
-        </button>
       </div>
 
 
       <div className="modal fade" id="postCreationModal" tabIndex="-1">
-        <div className="modal-dialog modal-lg"> {/* modal-lg for more space */}
+        <div className="modal-dialog modal-lg">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">Create a New Post</h5>
@@ -213,15 +200,36 @@ export const Profile = () => {
             </div>
             <div className="modal-body">
 
-              <PostCreation userId={profile_id} />
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <PostCreation userId={user_id} onPostCreated={loadUserPosts} />
             </div>
           </div>
         </div>
       </div>
 
+      <hr className="my-5" />
+
+      <h3 className="mb-4 text-center">My Posts</h3>
+      <div className="row justify-content-center">
+        {userPosts.length > 0 ? (
+          userPosts.map((post) => (
+            <PostsCard
+              key={post.post_id}
+              post_id={post.post_id}
+              image={post.image_url}
+              text={post.content_text}
+              userName={post.author_username}
+              userEmail={post.author_email}
+              onDelete={loadUserPosts}
+              showDelete={true}
+              authorId={post.author_id}
+            />
+          ))
+        ) : (
+          <div className="col-12 text-center">
+            <p className="text-muted italic">This user has no posts</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -60,8 +60,6 @@ def sign_up():
         }), 201
     except Exception as e:
         db.session.rollback()
-        import traceback
-        traceback.print_exc()
         print(f"Error al crear usuario: {e}")
         return jsonify({
             "message": "Internal Server Error",
@@ -82,12 +80,14 @@ def get_all_users():
 
 @api.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    try:
-        user = User.query.get(user_id)
-        if user:
-            return jsonify(user.serialize)
-    except Exception as e:
+    user = User.query.get(user_id)
+    if user is None:
         return jsonify({"message": "Usuario no encontrado"}), 404
+    try:
+        # serialize ya incluye los datos del perfil gracias a tu @property en el modelo
+        return jsonify(user.serialize), 200
+    except Exception as e:
+        return jsonify({"message": f"Error al procesar los datos: {str(e)}"}), 500
 
 
 @api.route('/users/<int:user_id>', methods=['PUT'])
@@ -100,6 +100,8 @@ def update_user(user_id):
             user.email = data.get('email', user.email)
             user.password_hash = data.get('password', user.password_hash)
             user.role = data.get('role', user.role)
+            user.profile_image_url = data.get(
+                'profile_image_url', user.profile_image_url)
             db.session.commit()
             return jsonify(user.serialize), 200
         return jsonify({"message": "Usuario no encontrado"}), 400
@@ -126,6 +128,31 @@ def delete_user(user_id):
                         }), 500
 
 
+# @api.route('/user_profiles', methods=['POST'])
+# def create_profile():
+#     try:
+#         data = request.get_json()
+#         new_profile = UserProfile(
+#             user_id=data['user_id'],
+#             display_name=data['display_name'],
+#             updated_at=datetime.now(),
+#             bio=data['bio'],
+#             genre=data['genre'],
+#             instrument=data['instrument'],
+#             founded_year=data['founded_year'],
+#             enterprise_type=data['enterprise_type'],
+#             location=data['location'],
+#             profile_image_url=data['profile_image_url'],
+#             website_url=data['website_url']
+#         )
+#         db.session.add(new_profile)
+#         db.session.commit()
+#         return jsonify(new_profile.serialize), 201
+
+#     except Exception as e:
+#         return jsonify({"msg": "Internal Server Error",
+#                         "error": str(e)
+#                         }), 500
 @api.route('/user_profiles', methods=['POST'])
 def create_profile():
     try:
@@ -145,12 +172,25 @@ def create_profile():
         )
         db.session.add(new_profile)
         db.session.commit()
+        user = User.query.get(data['user_id'])
+        db.session.refresh(user)
         return jsonify(new_profile.serialize), 201
 
     except Exception as e:
-        return jsonify({"msg": "Internal Server Error",
-                        "error": str(e)
-                        }), 500
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route('/user_profiles/user/<int:user_id>', methods=['GET'])
+def get_profile_by_user(user_id):
+    try:
+
+        profile = UserProfile.query.filter_by(user_id=user_id).first()
+        if profile:
+            return jsonify(profile.serialize), 200
+        return jsonify({"message": "Perfil no encontrado"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @api.route('/user_profiles', methods=['GET'])
@@ -271,18 +311,38 @@ def get_post(post_id):
         return jsonify({"Internal Server Error": str(e)}), 500
 
 
+# @api.route('/feed_posts/<int:post_id>', methods=['PUT'])
+# def update_post(post_id):
+#     try:
+#         data = request.get.json()
+#         post = post.query.get(post_id)
+#         if post:
+#             post.content_text = data.get('content_text', post.content_text)
+#             #post.updated_at=datetime.now(),
+#             #post.image_url=data.get('image_url', post.image_url),
+#             #post.publish_home=data.get('publish_home', post.publish_home)
+#             db.session.commit()
+#             return jsonify(post.serialize), 200
+#         return jsonify({"message": "No se pudo actualizar el post"}), 400
+
+#     except Exception as e:
+#         return jsonify({"Internal Server Error": str(e)}), 500
+
 @api.route('/feed_posts/<int:post_id>', methods=['PUT'])
 def update_post(post_id):
     try:
-        data = request.get.json()
-        post = post.query.get(post_id)
+        data = request.get_json()
+        post = db.session.get(FeedPost, post_id)
+
         if post:
+
             post.content_text = data.get('content_text', post.content_text)
             db.session.commit()
-            return jsonify(post.serialize), 200
-        return jsonify({"message": "No se pudo actualizar el post"}), 400
+            return jsonify({"post": post.serialize, "message": "Post actualizado"}), 200
 
+        return jsonify({"message": "Post no encontrado"}), 404
     except Exception as e:
+        db.session.rollback()
         return jsonify({"Internal Server Error": str(e)}), 500
 
 
@@ -558,6 +618,16 @@ def upload_image():
     file = request.files['image']
     result = cloudinary.uploader.upload(file)
     return result["secure_url"]
+
+
+@api.route('/users/<int:user_id>/posts', methods=['GET'])
+def get_user_posts(user_id):
+    try:
+
+        posts = FeedPost.query.filter_by(user_id=user_id).all()
+        return jsonify([post.serialize for post in posts]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UploadImg } from "./UploadImg";
 
-export default function PostCreation({ userId }) {
+export default function PostCreation({ userId, onPostCreated,  }) {  
     const [text, setText] = useState("");
     const [imgUrl, setImgUrl] = useState("");
     const [publishHome, setPublishHome] = useState(false)
@@ -9,12 +9,9 @@ export default function PostCreation({ userId }) {
     const handleSubmit = async () => {
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
             const response = await fetch(`${backendUrl}/api/feed_posts`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     content_text: text,
                     user_id: userId,
@@ -23,14 +20,20 @@ export default function PostCreation({ userId }) {
                 }),
             });
 
-            const data = await response.json();
-            console.log("Post saved", data);
+            if (response.ok) {
+                
+                setText("");
+                setImgUrl("");
+                setPublishHome(false);
 
-            setText("");
-            setImgUrl("");
-            setPublishHome(false);
-        }
-        catch (error) {
+                
+                if (onPostCreated) {
+                    onPostCreated(); 
+                }
+                
+                console.log("The post was created and the list was updated");
+            }
+        } catch (error) {
             console.error("Error saving post:", error);
         }
     };
@@ -69,5 +72,3 @@ export default function PostCreation({ userId }) {
         </div>
     );
 }
-    
-

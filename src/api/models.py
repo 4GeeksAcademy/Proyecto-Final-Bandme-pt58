@@ -37,9 +37,10 @@ class User(db.Model):
             "username": self.username,
             "email": self.email,
             "role": self.role,
+            "profile_image_url": self.profile_image_url,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "profile": self.profile.serialize() if self.profile else None,
+            "profile": self.profile.serialize if self.profile else None,
         }
 
 
@@ -93,7 +94,7 @@ class FeedPost(db.Model):
         Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.user_id"), nullable=False)
-
+    publish_home: Mapped[bool] = mapped_column(Boolean, default=False)
     content_text: Mapped[str] = mapped_column(Text)
     image_url = db.Column(db.String(255))
     publish_home = db.Column(db.Boolean, default=True)
@@ -118,7 +119,10 @@ class FeedPost(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "likes_count": self.likes_count,
-            "media_files": [m.serialize for m in self.media_files]
+            "author_id": self.user_id,
+            "media_files": [m.serialize for m in self.media_files],
+            "author_username": self.author.username if self.author else "Musician", "author_email": self.author.email if self.author else "no-email@bandme.com"
+
         }
 
 
@@ -130,9 +134,10 @@ class MediaFile(db.Model):
     post_id: Mapped[int] = mapped_column(
         ForeignKey("feed_posts.post_id"), nullable=False)
 
-    file_url: Mapped[str] = mapped_column(String(200), nullable=False)
+    file_url: Mapped[str] = mapped_column(String(500), nullable=False)
     file_type: Mapped[str] = mapped_column(
         Enum("image", "video", "audio", name="media_types"))
+    public_id: Mapped[str] = mapped_column(String(200), nullable=False)
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now())
 
@@ -183,6 +188,36 @@ class Follower(db.Model):
         }
 
 
+class Like(db.Model):
+    __tablename__ = "likes"
+
+    like_id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.user_id"), nullable=False)
+    post_id: Mapped[int] = mapped_column(
+        ForeignKey("feed_posts.post_id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=func.now())
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'post_id',
+                            name='unique_user_post_like'),
+    )
+
+    user = relationship("User", back_populates="likes")
+    post = relationship("FeedPost", back_populates="likes")
+
+    @property
+    def serialize(self):
+        return {
+            "like_id": self.like_id,
+            "user_id": self.user_id,
+            "post_id": self.post_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
 
 
 class FavoriteElement(db.Model):
@@ -210,53 +245,3 @@ class FavoriteElement(db.Model):
             "element_id": self.element_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
-
-
-class LikeYT(db.Model):
-    __tablename__ = "LikeYT"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        "users.user_id"), nullable=False)
-    track_id = db.Column(db.String(20), nullable=False)
-    is_like = db.Column(db.Boolean, nullable=False)
-
-    def serialize(self):
-        return {
-            "track_id": self.track_id,
-            "is_like": self.is_like,
-        }
-
-
-class Like(db.Model):
-    __tablename__ = "likes"
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.user_id"),
-        nullable=False
-    )
-
-    post_id = db.Column(
-        db.Integer,
-        db.ForeignKey("feed_posts.post_id"),
-        nullable=False
-    )
-
-    user = relationship("User", back_populates="likes")
-    post = relationship("FeedPost", back_populates="likes")
-
-    __table_args__ = (
-        db.UniqueConstraint("user_id", "post_id", name="unique_user_post_like"),
-    )
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "post_id": self.post_id
-        }
-    
-
-    
