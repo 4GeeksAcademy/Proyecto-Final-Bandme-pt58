@@ -82,13 +82,16 @@ def get_all_users():
 
 @api.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    try:
-        user = User.query.get(user_id)
-        if user:
-            return jsonify(user.serialize)
-    except Exception as e:
+    user = User.query.get(user_id)
+    
+    if user is None:
         return jsonify({"message": "Usuario no encontrado"}), 404
-
+        
+    try:
+        # serialize ya incluye los datos del perfil gracias a tu @property en el modelo
+        return jsonify(user.serialize), 200
+    except Exception as e:
+        return jsonify({"message": f"Error al procesar los datos: {str(e)}"}), 500
 
 @api.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
