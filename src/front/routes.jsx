@@ -13,7 +13,7 @@ import { SignUp } from "./pages/SignUp";
 import { Profile } from "./pages/Profile";
 import { Login } from "./pages/Login";
 import PricingPage from "./pages/PricingPage";
-import  AboutUs  from "./pages/AboutUs";
+import AboutUs from "./pages/AboutUs";
 
 
 
@@ -27,7 +27,7 @@ export const router = createBrowserRouter(
     // Note: The child paths of the Layout element replace the Outlet component with the elements contained in the "element" attribute of these child paths.
 
     // Root Route: All navigation will start from here.
-      <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
+    <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
       {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
       <Route path="/" element={<Home />} />
       <Route path="/single/:theId" element={<Single />} />  {/* Dynamic route for single items */}

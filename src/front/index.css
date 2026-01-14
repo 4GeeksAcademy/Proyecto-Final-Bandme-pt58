@@ -3,13 +3,249 @@ body {
   padding-bottom: 100px;
 }
 
-footer {
-  position: relative;
-  bottom: -100px;
-  padding-top: 100px;
-  left: 0;
+:root {
+  --green: #1db954;
+  --black: #121212;
+  --dark: #000000;
+  --gray: #b3b3b3;
+  --white: #fff;
+}
+
+.app-title {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.spotify-layout {
+  background: linear-gradient(180deg, #000000);
+
+}
+
+.top-row {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.left-panel {
+  display: flex;
+}
+
+.search-card {
+  background: var(--dark);
+  padding: 24px;
+  border-radius: 16px;
+  flex: 1;
+
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.input-group label {
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.input-group input {
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--white);
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--green);
+}
+
+.spotify-btn {
   width: 100%;
-  height: 100px;          /* ajusta a tu footer */
-  background-color: #1a1a1a;
-  z-index: 1000;
+  background: var(--green);
+  color: #000000;
+  border: none;
+  border-radius: 999px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.spotify-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 25px rgba(29, 185, 84, 0.4);
+}
+
+.video-box {
+  background: #000000;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(160, 40, 40, 0.7);
+  display: flex;
+  height: auto;
+}
+
+.video-box #yt-player {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.spotify-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #000000;
+  border-top: 1px solid #000000;
+  display: grid;
+  grid-template-columns: 1fr auto auto 2fr;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 24px;
+  z-index: 100;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+.player-info span {
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.player-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: var(--white);
+  color: #000;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.player-btn:hover {
+  transform: scale(1.1);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--gray);
+  cursor: pointer;
+}
+
+.icon-btn.liked {
+  color: var(--green);
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--gray);
+}
+
+.progress-bar span {
+  min-width: 40px;
+  text-align: center;
+}
+
+.progress-bar input[type="range"] {
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  background: #2a2a2a;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .top-row {
+    grid-template-columns: 1fr;
+  }}
+.flip-card {
+  background-color: transparent;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 0.375rem;
+}
+
+.flip-card-back {
+  background-color: #f8f9fa;
+  transform: rotateY(180deg);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 15px;
+  border: 1px solid #dee2e6;
+}
+
+
+.post-text-truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 4.5em; 
+}
+
+
+.post-card-container {
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.post-card-container:hover {
+  transform: translateY(-5px);
+  border-color: #0d6efd;
+}
+
+
+.author-info-overlay {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.post-card-container:hover .author-info-overlay {
+  opacity: 1;
 }
